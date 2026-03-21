@@ -32,26 +32,23 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className={`fixed top-4 right-4 z-50 p-3 rounded-xl shadow-lg transition-all lg:hidden ${
-          isScrolled ? 'bg-card' : 'bg-card/95 backdrop-blur'
-        }`}
-      >
-        {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <MenuIcon className="w-6 h-6 text-white" />}
-      </button>
-
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/80 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-0 z-40 bg-black/90 backdrop-blur-sm lg:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
       {/* Mobile Menu */}
-      <div className={`fixed top-0 right-0 h-full w-80 max-w-full bg-card z-50 transform transition-transform duration-300 lg:hidden border-l border-gray-800 ${
+      <div className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-gray-950 z-50 transform transition-transform duration-300 lg:hidden border-l border-gray-800 ${
         mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
-        <div className="p-6 pt-16">
+        <div className="p-6 pt-20">
+          <button 
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+
           <div className="flex items-center space-x-3 mb-6 pb-6 border-b border-gray-800">
             <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-xl flex items-center justify-center">
               <Heart className="w-5 h-5 text-secondary" />
@@ -119,7 +116,7 @@ const Layout = () => {
       </div>
 
       {/* Desktop Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 hidden lg:block ${
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 hidden lg:block ${
         isScrolled 
           ? 'bg-black/95 backdrop-blur-xl shadow-lg shadow-black/50' 
           : 'bg-black/90 backdrop-blur-md'
@@ -208,8 +205,8 @@ const Layout = () => {
         </div>
       </nav>
 
-      {/* Mobile Header (always visible) */}
-      <nav className={`fixed top-0 left-0 right-0 z-30 transition-all duration-500 lg:hidden ${
+      {/* Mobile Header */}
+      <nav className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 lg:hidden ${
         isScrolled || mobileMenuOpen
           ? 'bg-black/95 backdrop-blur-xl shadow-lg' 
           : 'bg-black/80 backdrop-blur-md'
@@ -222,6 +219,13 @@ const Layout = () => {
             <span className="text-lg font-heading font-bold text-white">Hope</span>
             <span className="text-lg font-heading font-bold text-secondary">Foundation</span>
           </Link>
+          
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <MenuIcon className="w-6 h-6 text-white" />}
+          </button>
         </div>
       </nav>
 
