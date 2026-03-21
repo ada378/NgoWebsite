@@ -115,41 +115,40 @@ const Home = () => {
           <div className="absolute inset-0 bg-black/85"></div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 py-32 text-center">
+        <div className="relative w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-16 md:py-24 lg:py-32 text-center">
           <div className={`${loaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
-            <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Hope Foundation • Since 2010</p>
+            <p className="text-secondary font-medium tracking-wider uppercase text-[9px] xs:text-xs sm:text-sm mb-1 sm:mb-4">Hope Foundation • Since 2010</p>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-6 leading-tight">
-              Creating <span className="text-secondary">Impact</span><br />
-              Building <span className="text-secondary">Hope</span>
+            <h1 className="text-xl xss:text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-2 sm:mb-6 leading-tight px-2">
+              <span className="text-secondary">Hope</span> & <span className="text-secondary">Impact</span>
             </h1>
             
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-              Empowering communities through education, healthcare, and sustainable development. Join 10,000+ donors making a difference.
+            <p className="text-gray-400 text-[10px] xs:text-xs sm:text-base md:text-xl max-w-xl mx-auto mb-4 sm:mb-10 leading-relaxed px-4 sm:px-0 hidden xss:block">
+              Empowering communities through education, healthcare & sustainable development.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/donate" className="w-full sm:w-auto px-8 py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center space-x-2">
-                <Heart className="w-5 h-5" />
+            <div className="flex flex-col xs:flex-row items-center justify-center gap-1.5 sm:gap-4 px-6 xs:px-0">
+              <Link to="/donate" className="w-full xs:w-auto min-w-[130px] sm:min-w-[160px] px-4 xs:px-6 sm:px-8 py-2 xs:py-3 sm:py-4 bg-secondary text-black font-semibold rounded-lg xs:rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center space-x-1.5 text-xs sm:text-base">
+                <Heart className="w-3 h-3 xs:w-4 xs:h-4" />
                 <span>Donate Now</span>
               </Link>
-              <Link to="/programs" className="w-full sm:w-auto px-8 py-4 border-2 border-gray-600 text-white font-semibold rounded-xl hover:border-secondary hover:text-secondary transition-all">
+              <Link to="/programs" className="w-full xs:w-auto min-w-[130px] sm:min-w-[160px] px-4 xs:px-6 sm:px-8 py-2 xs:py-3 sm:py-4 border-2 border-gray-600 text-white font-semibold rounded-lg xs:rounded-xl hover:border-secondary hover:text-secondary transition-all text-xs sm:text-base">
                 Our Programs
               </Link>
             </div>
 
-            <div className="flex items-center justify-center gap-8 md:gap-12 mt-16 text-center">
+            <div className="grid grid-cols-4 sm:grid-cols-4 gap-1 sm:gap-6 md:gap-10 mt-6 sm:mt-16 text-center px-2 sm:px-0">
               {impactStats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <p className="text-3xl md:text-4xl font-bold text-white">{stat.value.toLocaleString()}{stat.suffix}</p>
-                  <p className="text-gray-500 text-sm">{stat.label}</p>
+                <div key={i} className="bg-black/30 backdrop-blur-sm rounded-lg p-1.5 sm:p-0 sm:bg-transparent sm:backdrop-blur-none">
+                  <p className="text-sm xss:text-base xs:text-lg sm:text-3xl md:text-4xl font-bold text-white">{stat.value.toLocaleString()}{stat.suffix}</p>
+                  <p className="text-gray-500 text-[8px] xss:text-[10px] xs:text-xs sm:text-sm mt-0.5 sm:mt-1">{stat.label}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
           <div className="w-6 h-10 border-2 border-gray-500 rounded-full flex justify-center pt-2">
             <div className="w-1 h-2 bg-gray-500 rounded-full"></div>
           </div>

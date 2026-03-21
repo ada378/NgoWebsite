@@ -132,6 +132,10 @@ const Admin = () => {
     }
   }, [activeTab])
 
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [activeTab])
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('adminUser')
@@ -244,55 +248,41 @@ const Admin = () => {
     { id: 'reports', icon: FileText, label: 'Reports' },
   ]
 
+  const StatCard = ({ icon: Icon, value, label, color }) => (
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 sm:mb-4`}>
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+      </div>
+      <p className="font-display text-xl sm:text-2xl font-bold text-white">{value}</p>
+      <p className="text-xs sm:text-sm text-gray-400 mt-1">{label}</p>
+    </div>
+  )
+
   const Dashboard = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {loading ? (
         <div className="flex justify-center py-12"><RefreshCw className="w-8 h-8 text-secondary animate-spin" /></div>
       ) : (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-              <p className="font-display text-2xl font-bold text-white">{formatCurrency(stats?.totalDonations || 0)}</p>
-              <p className="text-sm text-gray-400">Total Donations</p>
-            </div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
-                <UsersIcon className="w-6 h-6 text-white" />
-              </div>
-              <p className="font-display text-2xl font-bold text-white">{stats?.totalDonors || 0}</p>
-              <p className="text-sm text-gray-400">Total Donors</p>
-            </div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-yellow-500 rounded-xl flex items-center justify-center mb-4">
-                <Heart className="w-6 h-6 text-black" />
-              </div>
-              <p className="font-display text-2xl font-bold text-white">{stats?.programCount || 0}</p>
-              <p className="text-sm text-gray-400">Active Programs</p>
-            </div>
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <p className="font-display text-2xl font-bold text-white">{certificates.length}</p>
-              <p className="text-sm text-gray-400">Certificates</p>
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <StatCard icon={DollarSign} value={formatCurrency(stats?.totalDonations || 0)} label="Total Donations" color="from-green-500 to-green-600" />
+            <StatCard icon={UsersIcon} value={stats?.totalDonors || 0} label="Total Donors" color="from-blue-500 to-blue-600" />
+            <StatCard icon={Heart} value={stats?.programCount || 0} label="Active Programs" color="from-secondary to-yellow-500" />
+            <StatCard icon={Award} value={certificates.length} label="Certificates" color="from-purple-500 to-purple-600" />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
             {stats?.programBreakdown?.length > 0 && (
-              <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 className="text-lg font-bold mb-4 text-white">Program Breakdown</h3>
-                <div className="space-y-3">
+              <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+                <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-white">Program Breakdown</h3>
+                <div className="space-y-2 sm:space-y-3">
                   {stats.programBreakdown.map((item, i) => (
-                    <div key={i} className="flex items-center space-x-4">
-                      <span className="w-28 text-sm font-medium text-gray-400">{item._id}</span>
-                      <div className="flex-1 h-4 bg-gray-700 rounded-full overflow-hidden">
+                    <div key={i} className="flex items-center gap-2 sm:gap-4">
+                      <span className="w-20 sm:w-28 text-xs sm:text-sm font-medium text-gray-400 truncate">{item._id}</span>
+                      <div className="flex-1 h-3 sm:h-4 bg-gray-700 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-secondary to-yellow-500 rounded-full" style={{ width: `${(item.total / stats.totalDonations) * 100}%` }}></div>
                       </div>
-                      <span className="w-20 text-sm font-bold text-secondary text-right">{formatCurrency(item.total)}</span>
+                      <span className="w-16 sm:w-20 text-xs sm:text-sm font-bold text-secondary text-right flex-shrink-0">{formatCurrency(item.total)}</span>
                     </div>
                   ))}
                 </div>
@@ -300,16 +290,16 @@ const Admin = () => {
             )}
 
             {analytics?.recentDonors?.length > 0 && (
-              <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 className="text-lg font-bold mb-4 text-white">Recent Donors</h3>
-                <div className="space-y-3">
+              <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+                <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-white">Recent Donors</h3>
+                <div className="space-y-2 sm:space-y-3">
                   {analytics.recentDonors.slice(0, 5).map((donor, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-white">{donor.name}</p>
-                        <p className="text-xs text-gray-400">{donor.email}</p>
+                    <div key={i} className="flex items-center justify-between p-2 sm:p-3 bg-gray-700/50 rounded-lg">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-white text-sm sm:text-base truncate">{donor.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{donor.email}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 bg-secondary/20 text-secondary rounded-full">{donor.role}</span>
+                      <span className="text-xs px-2 py-1 bg-secondary/20 text-secondary rounded-full flex-shrink-0 ml-2">{donor.role}</span>
                     </div>
                   ))}
                 </div>
@@ -317,29 +307,29 @@ const Admin = () => {
             )}
           </div>
 
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-white">Recent Donations</h3>
-              <button onClick={() => setActiveTab('donations')} className="text-sm text-secondary hover:underline">View All</button>
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-bold text-white">Recent Donations</h3>
+              <button onClick={() => setActiveTab('donations')} className="text-xs sm:text-sm text-secondary hover:underline">View All</button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full min-w-[500px] sm:min-w-0">
                 <thead>
-                  <tr className="text-left text-sm text-gray-400 border-b border-gray-700">
-                    <th className="pb-3">Donor</th>
-                    <th className="pb-3">Amount</th>
-                    <th className="pb-3">Program</th>
-                    <th className="pb-3">Status</th>
+                  <tr className="text-left text-xs sm:text-sm text-gray-400 border-b border-gray-700">
+                    <th className="pb-2 sm:pb-3">Donor</th>
+                    <th className="pb-2 sm:pb-3">Amount</th>
+                    <th className="pb-2 sm:pb-3 hidden sm:table-cell">Program</th>
+                    <th className="pb-2 sm:pb-3">Status</th>
                   </tr>
                 </thead>
-                <tbody className="text-sm">
+                <tbody className="text-xs sm:text-sm">
                   {donations.slice(0, 5).map((d, i) => (
                     <tr key={i} className="border-b border-gray-700 last:border-0">
-                      <td className="py-3 text-white">{d.donorName}</td>
-                      <td className="py-3 font-bold text-secondary">₹{d.amount.toLocaleString()}</td>
-                      <td className="py-3 text-gray-400">{d.program}</td>
-                      <td className="py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${d.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      <td className="py-2 sm:py-3 text-white">{d.donorName}</td>
+                      <td className="py-2 sm:py-3 font-bold text-secondary">₹{d.amount.toLocaleString()}</td>
+                      <td className="py-2 sm:py-3 text-gray-400 hidden sm:table-cell">{d.program}</td>
+                      <td className="py-2 sm:py-3">
+                        <span className={`px-2 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-semibold ${d.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                           {d.status}
                         </span>
                       </td>
@@ -355,64 +345,64 @@ const Admin = () => {
   )
 
   const Donations = () => (
-    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h3 className="text-lg font-bold text-white">All Donations</h3>
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-bold text-white">All Donations</h3>
         <div className="flex flex-wrap gap-2">
-          <select className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white" value={filters.status} onChange={(e) => { setFilters({ ...filters, status: e.target.value }); fetchDonations(1) }}>
-            <option value="">All Status</option>
+          <select className="px-2 sm:px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-xs sm:text-sm text-white" value={filters.status} onChange={(e) => { setFilters({ ...filters, status: e.target.value }); fetchDonations(1) }}>
+            <option value="">All</option>
             <option value="completed">Completed</option>
             <option value="pending">Pending</option>
           </select>
-          <select className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white" value={filters.program} onChange={(e) => { setFilters({ ...filters, program: e.target.value }); fetchDonations(1) }}>
+          <select className="px-2 sm:px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-xs sm:text-sm text-white" value={filters.program} onChange={(e) => { setFilters({ ...filters, program: e.target.value }); fetchDonations(1) }}>
             <option value="">All Programs</option>
             <option value="Education">Education</option>
             <option value="Healthcare">Healthcare</option>
-            <option value="Women Empowerment">Women Empowerment</option>
+            <option value="Women Empowerment">Women</option>
             <option value="Environment">Environment</option>
           </select>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+        <table className="w-full min-w-[700px] sm:min-w-0">
           <thead>
-            <tr className="text-left text-sm text-gray-400 border-b border-gray-700">
-              <th className="pb-3">Receipt No</th>
-              <th className="pb-3">Donor</th>
-              <th className="pb-3">Amount</th>
-              <th className="pb-3">Program</th>
-              <th className="pb-3">Date</th>
-              <th className="pb-3">Status</th>
-              <th className="pb-3">Actions</th>
+            <tr className="text-left text-xs sm:text-sm text-gray-400 border-b border-gray-700">
+              <th className="pb-2 sm:pb-3">Receipt</th>
+              <th className="pb-2 sm:pb-3">Donor</th>
+              <th className="pb-2 sm:pb-3">Amount</th>
+              <th className="pb-2 sm:pb-3 hidden md:table-cell">Program</th>
+              <th className="pb-2 sm:pb-3">Date</th>
+              <th className="pb-2 sm:pb-3">Status</th>
+              <th className="pb-2 sm:pb-3">Actions</th>
             </tr>
           </thead>
-          <tbody className="text-sm">
+          <tbody className="text-xs sm:text-sm">
             {donations.map((d, i) => (
               <tr key={i} className="border-b border-gray-700 last:border-0 hover:bg-gray-700/50">
-                <td className="py-3 font-mono text-gray-400">{d.receiptNumber || 'N/A'}</td>
-                <td className="py-3 text-white">{d.donorName}</td>
-                <td className="py-3 font-bold text-secondary">₹{d.amount.toLocaleString()}</td>
-                <td className="py-3 text-gray-400">{d.program}</td>
-                <td className="py-3 text-gray-400">{formatDate(d.completedAt || d.createdAt)}</td>
-                <td className="py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${d.status === 'completed' ? 'bg-green-500/20 text-green-400' : d.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>
+                <td className="py-2 sm:py-3 font-mono text-gray-400">{d.receiptNumber || 'N/A'}</td>
+                <td className="py-2 sm:py-3 text-white">{d.donorName}</td>
+                <td className="py-2 sm:py-3 font-bold text-secondary">₹{d.amount.toLocaleString()}</td>
+                <td className="py-2 sm:py-3 text-gray-400 hidden md:table-cell">{d.program}</td>
+                <td className="py-2 sm:py-3 text-gray-400">{formatDate(d.completedAt || d.createdAt)}</td>
+                <td className="py-2 sm:py-3">
+                  <span className={`px-2 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-semibold ${d.status === 'completed' ? 'bg-green-500/20 text-green-400' : d.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>
                     {d.status}
                   </span>
                 </td>
-                <td className="py-3">
-                  <div className="flex items-center gap-2">
+                <td className="py-2 sm:py-3">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     {d.status === 'pending' && (
                       <>
-                        <button onClick={() => handleVerifyDonation(d._id, 'completed')} className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30" title="Verify">
-                          <CheckCircle className="w-4 h-4" />
+                        <button onClick={() => handleVerifyDonation(d._id, 'completed')} className="p-1 sm:p-1.5 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30" title="Verify">
+                          <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
-                        <button onClick={() => handleVerifyDonation(d._id, 'rejected')} className="p-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30" title="Reject">
-                          <XCircle className="w-4 h-4" />
+                        <button onClick={() => handleVerifyDonation(d._id, 'rejected')} className="p-1 sm:p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30" title="Reject">
+                          <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                       </>
                     )}
-                    <button onClick={() => { setEditData(d); setShowModal('donation-detail') }} className="p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30" title="View">
-                      <Eye className="w-4 h-4" />
+                    <button onClick={() => { setEditData(d); setShowModal('donation-detail') }} className="p-1 sm:p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30" title="View">
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 </td>
@@ -423,38 +413,38 @@ const Admin = () => {
       </div>
       {pagination.pages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-4">
-          <button disabled={pagination.page === 1} onClick={() => fetchDonations(pagination.page - 1)} className="p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
-          <span className="text-sm text-gray-400">Page {pagination.page} of {pagination.pages}</span>
-          <button disabled={pagination.page === pagination.pages} onClick={() => fetchDonations(pagination.page + 1)} className="p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
+          <button disabled={pagination.page === 1} onClick={() => fetchDonations(pagination.page - 1)} className="p-1.5 sm:p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
+          <span className="text-xs sm:text-sm text-gray-400">Page {pagination.page} of {pagination.pages}</span>
+          <button disabled={pagination.page === pagination.pages} onClick={() => fetchDonations(pagination.page + 1)} className="p-1.5 sm:p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
         </div>
       )}
     </div>
   )
 
   const Donors = () => (
-    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-      <h3 className="text-lg font-bold mb-6 text-white">Donor Management</h3>
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-white">Donor Management</h3>
       {donors.length === 0 ? (
         <p className="text-gray-400 text-center py-8">No donors found</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {donors.map((donor, i) => (
-            <div key={i} className="border border-gray-700 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
-                  <UsersIcon className="w-5 h-5 text-secondary" />
+            <div key={i} className="border border-gray-700 rounded-xl p-3 sm:p-4 hover:bg-gray-700/50 transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                 </div>
-                <div>
-                  <p className="font-bold text-white">{donor.name}</p>
-                  <p className="text-xs text-gray-400">{donor.email}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-white text-sm sm:text-base truncate">{donor.name}</p>
+                  <p className="text-xs text-gray-400 truncate">{donor.email}</p>
                 </div>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-400">{donor.donationCount || 0} donations</span>
                 <span className="font-bold text-secondary">₹{(donor.totalAmount || 0).toLocaleString()}</span>
               </div>
-              <button onClick={() => { setEmailForm({ ...emailForm, to: donor.email }); setShowModal('email') }} className="mt-3 w-full px-3 py-2 bg-gray-700 text-secondary rounded-lg text-sm hover:bg-gray-600 flex items-center justify-center gap-1">
-                <Mail className="w-4 h-4" /> Send Email
+              <button onClick={() => { setEmailForm({ ...emailForm, to: donor.email }); setShowModal('email') }} className="mt-2 sm:mt-3 w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 text-secondary rounded-lg text-xs sm:text-sm hover:bg-gray-600 flex items-center justify-center gap-1">
+                <Mail className="w-3 h-3 sm:w-4 sm:h-4" /> Email
               </button>
             </div>
           ))}
@@ -491,26 +481,26 @@ const Admin = () => {
     }
 
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-white">Programs Management</h3>
-          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active' }) }} className="px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Program
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h3 className="text-base sm:text-lg font-bold text-white">Programs Management</h3>
+          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active' }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" /> <span className="hidden xs:inline">Add</span> Program
           </button>
         </div>
 
         {showForm && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-secondary/50">
-            <h4 className="text-lg font-bold text-white mb-4">{editData?._id ? 'Edit Program' : 'Add New Program'}</h4>
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-secondary/50">
+            <h4 className="text-base sm:text-lg font-bold text-white mb-4">{editData?._id ? 'Edit Program' : 'Add New Program'}</h4>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Title</label>
-                  <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Title</label>
+                  <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Category</label>
-                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white">
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Category</label>
+                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm">
                     <option value="Education">Education</option>
                     <option value="Healthcare">Healthcare</option>
                     <option value="Women Empowerment">Women Empowerment</option>
@@ -519,61 +509,61 @@ const Admin = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Description</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Lives Impacted</label>
-                  <input type="number" value={formData.impactStats.livesImpacted} onChange={(e) => setFormData({ ...formData, impactStats: { ...formData.impactStats, livesImpacted: parseInt(e.target.value) } })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Lives Impacted</label>
+                  <input type="number" value={formData.impactStats.livesImpacted} onChange={(e) => setFormData({ ...formData, impactStats: { ...formData.impactStats, livesImpacted: parseInt(e.target.value) || 0 } })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Target (₹)</label>
-                  <input type="number" value={formData.goals.target} onChange={(e) => setFormData({ ...formData, goals: { ...formData.goals, target: parseInt(e.target.value) } })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Target (₹)</label>
+                  <input type="number" value={formData.goals.target} onChange={(e) => setFormData({ ...formData, goals: { ...formData.goals, target: parseInt(e.target.value) || 0 } })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" />
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Status</label>
-                  <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white">
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Status</label>
+                  <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </select>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="px-6 py-2 bg-secondary text-black rounded-lg font-semibold">{editData?._id ? 'Update' : 'Create'}</button>
-                <button type="button" onClick={() => { setShowForm(false); setEditData(null) }} className="px-6 py-2 bg-gray-700 text-white rounded-lg">Cancel</button>
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+                <button type="submit" className="px-4 sm:px-6 py-2 sm:py-2.5 bg-secondary text-black rounded-lg font-semibold text-sm">{editData?._id ? 'Update' : 'Create'}</button>
+                <button type="button" onClick={() => { setShowForm(false); setEditData(null) }} className="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-700 text-white rounded-lg text-sm">Cancel</button>
               </div>
             </form>
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {programs.map((p, i) => (
-            <div key={i} className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-                <div>
-                  <h3 className="font-bold text-lg text-white">{p.title}</h3>
-                  <span className="text-sm text-gray-400">{p.category}</span>
+            <div key={i} className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-bold text-base sm:text-lg text-white truncate">{p.title}</h3>
+                  <span className="text-xs sm:text-sm text-gray-400">{p.category}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${p.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{p.status}</span>
-                  <button onClick={() => handleEdit(p)} className="p-2 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => handleDeleteProgram(p._id)} className="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-semibold ${p.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{p.status}</span>
+                  <button onClick={() => handleEdit(p)} className="p-1.5 sm:p-2 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"><Edit className="w-3 h-3 sm:w-4 sm:h-4" /></button>
+                  <button onClick={() => handleDeleteProgram(p._id)} className="p-1.5 sm:p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></button>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm mb-4 line-clamp-2">{p.description}</p>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-gray-700/50 rounded-lg p-3">
-                  <p className="font-bold text-secondary">{p.impactStats?.livesImpacted?.toLocaleString() || 0}</p>
-                  <p className="text-xs text-gray-400">Lives Impacted</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{p.description}</p>
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                <div className="bg-gray-700/50 rounded-lg p-2 sm:p-3">
+                  <p className="font-bold text-secondary text-sm sm:text-lg">{p.impactStats?.livesImpacted?.toLocaleString() || 0}</p>
+                  <p className="text-xs text-gray-400 hidden xs:block">Lives</p>
                 </div>
-                <div className="bg-gray-700/50 rounded-lg p-3">
-                  <p className="font-bold text-secondary">₹{((p.goals?.raised || 0) / 100000).toFixed(1)}L</p>
-                  <p className="text-xs text-gray-400">Raised</p>
+                <div className="bg-gray-700/50 rounded-lg p-2 sm:p-3">
+                  <p className="font-bold text-secondary text-sm sm:text-lg">₹{((p.goals?.raised || 0) / 100000).toFixed(1)}L</p>
+                  <p className="text-xs text-gray-400 hidden xs:block">Raised</p>
                 </div>
-                <div className="bg-gray-700/50 rounded-lg p-3">
-                  <p className="font-bold text-secondary">₹{((p.goals?.target || 0) / 100000).toFixed(1)}L</p>
-                  <p className="text-xs text-gray-400">Target</p>
+                <div className="bg-gray-700/50 rounded-lg p-2 sm:p-3">
+                  <p className="font-bold text-secondary text-sm sm:text-lg">₹{((p.goals?.target || 0) / 100000).toFixed(1)}L</p>
+                  <p className="text-xs text-gray-400 hidden xs:block">Target</p>
                 </div>
               </div>
             </div>
@@ -612,91 +602,91 @@ const Admin = () => {
     }
 
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-white">Blog Management</h3>
-          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true }) }} className="px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add Blog
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <h3 className="text-base sm:text-lg font-bold text-white">Blog Management</h3>
+          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" /> <span className="hidden xs:inline">Add</span> Blog
           </button>
         </div>
 
         {showForm && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-secondary/50">
-            <h4 className="text-lg font-bold text-white mb-4">{editData?._id ? 'Edit Blog' : 'Add New Blog'}</h4>
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-secondary/50">
+            <h4 className="text-base sm:text-lg font-bold text-white mb-4">{editData?._id ? 'Edit Blog' : 'Add New Blog'}</h4>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Title</label>
-                  <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Title</label>
+                  <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Category</label>
-                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white">
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Category</label>
+                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm">
                     <option value="News">News</option>
                     <option value="Impact Report">Impact Report</option>
                     <option value="Success Story">Success Story</option>
-                    <option value="Campaign Update">Campaign Update</option>
+                    <option value="Campaign Update">Campaign</option>
                     <option value="Event">Event</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Excerpt</label>
-                <input type="text" value={formData.excerpt} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Excerpt</label>
+                <input type="text" value={formData.excerpt} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Content</label>
-                <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={5} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Content</label>
+                <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Author</label>
-                  <input type="text" value={formData.authorName} onChange={(e) => setFormData({ ...formData, authorName: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Author</label>
+                  <input type="text" value={formData.authorName} onChange={(e) => setFormData({ ...formData, authorName: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Tags (comma separated)</label>
-                  <input type="text" value={formData.tags} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                  <label className="block text-xs sm:text-sm text-gray-400 mb-1">Tags</label>
+                  <input type="text" value={formData.tags} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" placeholder="tag1, tag2" />
                 </div>
-                <div className="flex items-center gap-4 pt-6">
-                  <label className="flex items-center gap-2 text-gray-400"><input type="checkbox" checked={formData.featured} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} className="w-4 h-4" /> Featured</label>
-                  <label className="flex items-center gap-2 text-gray-400"><input type="checkbox" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} className="w-4 h-4" /> Published</label>
+                <div className="flex items-center gap-4 pt-6 sm:pt-7">
+                  <label className="flex items-center gap-1.5 sm:gap-2 text-gray-400 text-xs sm:text-sm"><input type="checkbox" checked={formData.featured} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} className="w-3 h-3 sm:w-4 sm:h-4" /> Featured</label>
+                  <label className="flex items-center gap-1.5 sm:gap-2 text-gray-400 text-xs sm:text-sm"><input type="checkbox" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} className="w-3 h-3 sm:w-4 sm:h-4" /> Published</label>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="px-6 py-2 bg-secondary text-black rounded-lg font-semibold">{editData?._id ? 'Update' : 'Create'}</button>
-                <button type="button" onClick={() => { setShowForm(false); setEditData(null) }} className="px-6 py-2 bg-gray-700 text-white rounded-lg">Cancel</button>
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+                <button type="submit" className="px-4 sm:px-6 py-2 sm:py-2.5 bg-secondary text-black rounded-lg font-semibold text-sm">{editData?._id ? 'Update' : 'Create'}</button>
+                <button type="button" onClick={() => { setShowForm(false); setEditData(null) }} className="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-700 text-white rounded-lg text-sm">Cancel</button>
               </div>
             </form>
           </div>
         )}
 
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table className="w-full min-w-[600px] sm:min-w-0">
               <thead>
-                <tr className="text-left text-sm text-gray-400 border-b border-gray-700">
-                  <th className="pb-3">Title</th>
-                  <th className="pb-3">Category</th>
-                  <th className="pb-3">Author</th>
-                  <th className="pb-3">Status</th>
-                  <th className="pb-3">Actions</th>
+                <tr className="text-left text-xs sm:text-sm text-gray-400 border-b border-gray-700">
+                  <th className="pb-2 sm:pb-3">Title</th>
+                  <th className="pb-2 sm:pb-3 hidden sm:table-cell">Category</th>
+                  <th className="pb-2 sm:pb-3 hidden md:table-cell">Author</th>
+                  <th className="pb-2 sm:pb-3">Status</th>
+                  <th className="pb-2 sm:pb-3">Actions</th>
                 </tr>
               </thead>
-              <tbody className="text-sm">
+              <tbody className="text-xs sm:text-sm">
                 {blogs.map((blog, i) => (
                   <tr key={i} className="border-b border-gray-700 last:border-0">
-                    <td className="py-3 text-white">{blog.title}</td>
-                    <td className="py-3 text-gray-400">{blog.category}</td>
-                    <td className="py-3 text-gray-400">{blog.authorName}</td>
-                    <td className="py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${blog.published ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                    <td className="py-2 sm:py-3 text-white max-w-[150px] sm:max-w-none truncate">{blog.title}</td>
+                    <td className="py-2 sm:py-3 text-gray-400 hidden sm:table-cell">{blog.category}</td>
+                    <td className="py-2 sm:py-3 text-gray-400 hidden md:table-cell">{blog.authorName}</td>
+                    <td className="py-2 sm:py-3">
+                      <span className={`px-2 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-semibold ${blog.published ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                         {blog.published ? 'Published' : 'Draft'}
                       </span>
                     </td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleEdit(blog)} className="p-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => handleDeleteBlog(blog._id)} className="p-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                    <td className="py-2 sm:py-3">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <button onClick={() => handleEdit(blog)} className="p-1 sm:p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"><Edit className="w-3 h-3 sm:w-4 sm:h-4" /></button>
+                        <button onClick={() => handleDeleteBlog(blog._id)} className="p-1 sm:p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -710,40 +700,39 @@ const Admin = () => {
   }
 
   const Users = () => (
-    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-      <h3 className="text-lg font-bold mb-6 text-white">User Management</h3>
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-white">User Management</h3>
       {users.length === 0 ? (
         <p className="text-gray-400 text-center py-8">No users found</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[500px] sm:min-w-0">
             <thead>
-              <tr className="text-left text-sm text-gray-400 border-b border-gray-700">
-                <th className="pb-3">Name</th>
-                <th className="pb-3">Email</th>
-                <th className="pb-3">Role</th>
-                <th className="pb-3">Joined</th>
-                <th className="pb-3">Actions</th>
+              <tr className="text-left text-xs sm:text-sm text-gray-400 border-b border-gray-700">
+                <th className="pb-2 sm:pb-3">Name</th>
+                <th className="pb-2 sm:pb-3 hidden sm:table-cell">Email</th>
+                <th className="pb-2 sm:pb-3">Role</th>
+                <th className="pb-2 sm:pb-3 hidden md:table-cell">Joined</th>
+                <th className="pb-2 sm:pb-3">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-sm">
+            <tbody className="text-xs sm:text-sm">
               {users.map((u, i) => (
                 <tr key={i} className="border-b border-gray-700 last:border-0">
-                  <td className="py-3 text-white">{u.name}</td>
-                  <td className="py-3 text-gray-400">{u.email}</td>
-                  <td className="py-3">
-                    <select value={u.role} onChange={(e) => handleUpdateUser(u._id, e.target.value)}
-                      className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs">
+                  <td className="py-2 sm:py-3 text-white">{u.name}</td>
+                  <td className="py-2 sm:py-3 text-gray-400 hidden sm:table-cell truncate max-w-[150px]">{u.email}</td>
+                  <td className="py-2 sm:py-3">
+                    <select value={u.role} onChange={(e) => handleUpdateUser(u._id, e.target.value)} className="px-1.5 sm:px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs sm:text-sm">
                       <option value="donor">Donor</option>
                       <option value="volunteer">Volunteer</option>
                       <option value="admin">Admin</option>
                     </select>
                   </td>
-                  <td className="py-3 text-gray-400">{formatDate(u.createdAt)}</td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => { setEmailForm({ ...emailForm, to: u.email }); setShowModal('email') }} className="p-1 bg-gray-700 text-secondary rounded hover:bg-gray-600"><Mail className="w-4 h-4" /></button>
-                      {u.role !== 'admin' && <button onClick={() => handleDeleteUser(u._id)} className="p-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-4 h-4" /></button>}
+                  <td className="py-2 sm:py-3 text-gray-400 hidden md:table-cell">{formatDate(u.createdAt)}</td>
+                  <td className="py-2 sm:py-3">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <button onClick={() => { setEmailForm({ ...emailForm, to: u.email }); setShowModal('email') }} className="p-1 sm:p-1.5 bg-gray-700 text-secondary rounded hover:bg-gray-600"><Mail className="w-3 h-3 sm:w-4 sm:h-4" /></button>
+                      {u.role !== 'admin' && <button onClick={() => handleDeleteUser(u._id)} className="p-1 sm:p-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></button>}
                     </div>
                   </td>
                 </tr>
@@ -754,38 +743,38 @@ const Admin = () => {
       )}
       {pagination.pages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-4">
-          <button disabled={pagination.page === 1} onClick={() => fetchUsers(pagination.page - 1)} className="p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
-          <span className="text-sm text-gray-400">Page {pagination.page} of {pagination.pages}</span>
-          <button disabled={pagination.page === pagination.pages} onClick={() => fetchUsers(pagination.page + 1)} className="p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
+          <button disabled={pagination.page === 1} onClick={() => fetchUsers(pagination.page - 1)} className="p-1.5 sm:p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
+          <span className="text-xs sm:text-sm text-gray-400">Page {pagination.page} of {pagination.pages}</span>
+          <button disabled={pagination.page === pagination.pages} onClick={() => fetchUsers(pagination.page + 1)} className="p-1.5 sm:p-2 bg-gray-700 rounded-lg disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
         </div>
       )}
     </div>
   )
 
   const Certificates = () => (
-    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-      <h3 className="text-lg font-bold mb-6 text-white">Certificate Management</h3>
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-white">Certificate Management</h3>
       {certificates.length === 0 ? (
         <p className="text-gray-400 text-center py-8">No certificates found</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {certificates.map((cert, i) => (
-            <div key={i} className="border border-gray-700 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center">
-                  <Award className="w-5 h-5 text-secondary" />
+            <div key={i} className="border border-gray-700 rounded-xl p-3 sm:p-4 hover:bg-gray-700/50 transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                 </div>
-                <div>
-                  <p className="font-mono text-xs text-gray-400">{cert.certificateId}</p>
-                  <p className="font-bold text-white">{cert.donorName}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-xs text-gray-400 truncate">{cert.certificateId}</p>
+                  <p className="font-bold text-white text-sm truncate">{cert.donorName}</p>
                 </div>
               </div>
-              <div className="text-sm space-y-1 mb-3">
+              <div className="text-xs sm:text-sm space-y-1 mb-3">
                 <p><span className="text-gray-400">Amount:</span> <span className="font-bold text-secondary">₹{cert.amount.toLocaleString()}</span></p>
                 <p><span className="text-gray-400">Date:</span> {formatDate(cert.completedAt)}</p>
               </div>
-              <a href={`/api/certificates/${cert.certificateId}/download`} target="_blank" className="w-full px-3 py-2 bg-secondary text-black rounded-lg text-sm font-medium hover:bg-yellow-400 flex items-center justify-center gap-1">
-                <Download className="w-4 h-4" /> Download
+              <a href={`/api/certificates/${cert.certificateId}/download`} target="_blank" className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-secondary text-black rounded-lg text-xs sm:text-sm font-medium hover:bg-yellow-400 flex items-center justify-center gap-1">
+                <Download className="w-3 h-3 sm:w-4 sm:h-4" /> Download
               </a>
             </div>
           ))}
@@ -795,57 +784,42 @@ const Admin = () => {
   )
 
   const Analytics = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-white">Analytics & Reports</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <h3 className="text-base sm:text-lg font-bold text-white">Analytics & Reports</h3>
       
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <TrendingUp className="w-8 h-8 text-green-500 mb-2" />
-          <p className="font-display text-2xl font-bold text-white">{formatCurrency(analytics?.totalDonations || 0)}</p>
-          <p className="text-sm text-gray-400">Total Raised</p>
-        </div>
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <Activity className="w-8 h-8 text-blue-500 mb-2" />
-          <p className="font-display text-2xl font-bold text-white">{analytics?.totalDonationsCount || 0}</p>
-          <p className="text-sm text-gray-400">Total Donations</p>
-        </div>
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <UsersIcon className="w-8 h-8 text-secondary mb-2" />
-          <p className="font-display text-2xl font-bold text-white">{analytics?.recentDonors?.length || 0}</p>
-          <p className="text-sm text-gray-400">Total Users</p>
-        </div>
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <BarChart className="w-8 h-8 text-purple-500 mb-2" />
-          <p className="font-display text-2xl font-bold text-white">{analytics?.donationsByProgram?.length || 0}</p>
-          <p className="text-sm text-gray-400">Programs</p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard icon={TrendingUp} value={formatCurrency(analytics?.totalDonations || 0)} label="Total Raised" color="from-green-500 to-green-600" />
+        <StatCard icon={Activity} value={analytics?.totalDonationsCount || 0} label="Donations" color="from-blue-500 to-blue-600" />
+        <StatCard icon={UsersIcon} value={analytics?.recentDonors?.length || 0} label="Total Users" color="from-secondary to-yellow-500" />
+        <StatCard icon={BarChart} value={analytics?.donationsByProgram?.length || 0} label="Programs" color="from-purple-500 to-purple-600" />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
         {analytics?.donationsByMonth?.length > 0 && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-            <h4 className="font-bold text-white mb-4">Monthly Donations</h4>
-            <ResponsiveContainer width="100%" height={300}>
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+            <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">Monthly Donations</h4>
+            <ResponsiveContainer width="100%" height={250}>
               <RechartsBar data={analytics.donationsByMonth}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="_id" stroke="#9CA3AF" fontSize={12} />
-                <YAxis stroke="#9CA3AF" fontSize={12} tickFormatter={(v) => `₹${(v/100000).toFixed(0)}L`} />
-                <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']} contentStyle={{ backgroundColor: '#1F2937', border: 'none' }} />
-                <Bar dataKey="total" fill="#D4A84B" radius={[8, 8, 0, 0]} />
+                <XAxis dataKey="_id" stroke="#9CA3AF" fontSize={10} />
+                <YAxis stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `₹${(v/100000).toFixed(0)}L`} />
+                <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']} contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px' }} />
+                <Bar dataKey="total" fill="#D4A84B" radius={[6, 6, 0, 0]} />
               </RechartsBar>
             </ResponsiveContainer>
           </div>
         )}
 
         {analytics?.donationsByProgram?.length > 0 && (
-          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-            <h4 className="font-bold text-white mb-4">Donations by Program</h4>
-            <ResponsiveContainer width="100%" height={300}>
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+            <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">By Program</h4>
+            <ResponsiveContainer width="100%" height={250}>
               <RechartsPie>
-                <Pie data={analytics.donationsByProgram} cx="50%" cy="50%" outerRadius={100} dataKey="total" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                <Pie data={analytics.donationsByProgram} cx="50%" cy="50%" outerRadius={80} dataKey="total" label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
                   {analytics.donationsByProgram.map((entry, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']} contentStyle={{ backgroundColor: '#1F2937', border: 'none' }} />
+                <Tooltip formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']} contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px' }} />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
               </RechartsPie>
             </ResponsiveContainer>
           </div>
@@ -853,13 +827,13 @@ const Admin = () => {
       </div>
 
       {analytics?.donationsByPaymentMethod?.length > 0 && (
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <h4 className="font-bold text-white mb-4">Payment Methods</h4>
-          <div className="grid sm:grid-cols-3 gap-4">
+        <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+          <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">Payment Methods</h4>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             {analytics.donationsByPaymentMethod.map((method, i) => (
-              <div key={i} className="bg-gray-700/50 rounded-xl p-4 text-center">
-                <p className="font-display text-2xl font-bold text-secondary">{method.count}</p>
-                <p className="text-sm text-gray-400">{method._id}</p>
+              <div key={i} className="bg-gray-700/50 rounded-xl p-3 sm:p-4 text-center">
+                <p className="font-display text-lg sm:text-2xl font-bold text-secondary">{method.count}</p>
+                <p className="text-xs sm:text-sm text-gray-400">{method._id}</p>
                 <p className="text-xs text-secondary">₹{method.total.toLocaleString()}</p>
               </div>
             ))}
@@ -870,73 +844,73 @@ const Admin = () => {
   )
 
   const Email = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-bold text-white">Email & Notifications</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <h3 className="text-base sm:text-lg font-bold text-white">Email & Notifications</h3>
       
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <h4 className="font-bold text-white mb-4 flex items-center gap-2"><Mail className="w-5 h-5 text-secondary" /> Send Single Email</h4>
-          <form onSubmit={handleSendEmail} className="space-y-4">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+          <h4 className="font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base"><Mail className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Send Email</h4>
+          <form onSubmit={handleSendEmail} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Recipient Email</label>
-              <input type="email" value={emailForm.to} onChange={(e) => setEmailForm({ ...emailForm, to: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Recipient Email</label>
+              <input type="email" value={emailForm.to} onChange={(e) => setEmailForm({ ...emailForm, to: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Subject</label>
-              <input type="text" value={emailForm.subject} onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Subject</label>
+              <input type="text" value={emailForm.subject} onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Message</label>
-              <textarea value={emailForm.message} onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })} rows={4} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Message</label>
+              <textarea value={emailForm.message} onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
             </div>
-            <button type="submit" className="w-full px-6 py-3 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center justify-center gap-2">
+            <button type="submit" className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center justify-center gap-2 text-sm">
               <Send className="w-4 h-4" /> Send Email
             </button>
           </form>
         </div>
 
-        <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-          <h4 className="font-bold text-white mb-4 flex items-center gap-2"><Send className="w-5 h-5 text-secondary" /> Broadcast Message</h4>
-          <form onSubmit={handleBroadcast} className="space-y-4">
+        <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+          <h4 className="font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base"><Send className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Broadcast</h4>
+          <form onSubmit={handleBroadcast} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Target Audience</label>
-              <select value={broadcastForm.target} onChange={(e) => setBroadcastForm({ ...broadcastForm, target: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white">
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Target</label>
+              <select value={broadcastForm.target} onChange={(e) => setBroadcastForm({ ...broadcastForm, target: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm">
                 <option value="all">All Users</option>
                 <option value="donors">All Donors</option>
                 <option value="admin">Admins Only</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Subject</label>
-              <input type="text" value={broadcastForm.subject} onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Subject</label>
+              <input type="text" value={broadcastForm.subject} onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Message</label>
-              <textarea value={broadcastForm.message} onChange={(e) => setBroadcastForm({ ...broadcastForm, message: e.target.value })} rows={4} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+              <label className="block text-xs sm:text-sm text-gray-400 mb-1">Message</label>
+              <textarea value={broadcastForm.message} onChange={(e) => setBroadcastForm({ ...broadcastForm, message: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
             </div>
-            <button type="submit" className="w-full px-6 py-3 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center justify-center gap-2">
+            <button type="submit" className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center justify-center gap-2 text-sm">
               <Send className="w-4 h-4" /> Send Broadcast
             </button>
           </form>
         </div>
       </div>
 
-      <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-        <h4 className="font-bold text-white mb-4">Quick Actions</h4>
-        <div className="grid sm:grid-cols-3 gap-4">
-          <button onClick={() => { setBroadcastForm({ subject: 'Thank You for Your Donation!', message: 'Dear Donor,\n\nThank you for your generous donation to Hope Foundation. Your support helps us make a real difference in the lives of those we serve.\n\nWith gratitude,\nHope Foundation Team', target: 'donors' }); setShowModal('broadcast') }} className="p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
-            <Mail className="w-6 h-6 text-secondary mb-2" />
-            <p className="font-medium text-white">Thank You Email</p>
-            <p className="text-xs text-gray-400">Send to all donors</p>
+      <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+        <h4 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">Quick Actions</h4>
+        <div className="grid grid-cols-1 xs:grid-cols-3 gap-3">
+          <button onClick={() => { setBroadcastForm({ subject: 'Thank You for Your Donation!', message: 'Dear Donor,\n\nThank you for your generous donation...', target: 'donors' }); setShowModal('broadcast') }} className="p-3 sm:p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
+            <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-secondary mb-2" />
+            <p className="font-medium text-white text-sm">Thank You Email</p>
+            <p className="text-xs text-gray-400">Send to donors</p>
           </button>
-          <button onClick={() => { setBroadcastForm({ subject: 'Monthly Newsletter - Hope Foundation Update', message: 'Dear Supporter,\n\nHere\'s what we\'ve been working on this month...\n\nThank you for being part of our journey.\n\nWarm regards,\nHope Foundation', target: 'all' }); setShowModal('broadcast') }} className="p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
-            <FileText className="w-6 h-6 text-secondary mb-2" />
-            <p className="font-medium text-white">Newsletter</p>
-            <p className="text-xs text-gray-400">Send to all users</p>
+          <button onClick={() => { setBroadcastForm({ subject: 'Newsletter', message: 'Update message...', target: 'all' }); setShowModal('broadcast') }} className="p-3 sm:p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-secondary mb-2" />
+            <p className="font-medium text-white text-sm">Newsletter</p>
+            <p className="text-xs text-gray-400">Send to all</p>
           </button>
-          <button onClick={() => { setBroadcastForm({ subject: 'New Program Launch - We Need Your Support!', message: 'Dear Supporter,\n\nWe\'re excited to announce our new program...\n\nPlease consider making a donation to support this initiative.\n\nThank you!\nHope Foundation', target: 'all' }); setShowModal('broadcast') }} className="p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
-            <Heart className="w-6 h-6 text-secondary mb-2" />
-            <p className="font-medium text-white">Campaign Alert</p>
+          <button onClick={() => { setBroadcastForm({ subject: 'Campaign Alert', message: 'Support needed...', target: 'all' }); setShowModal('broadcast') }} className="p-3 sm:p-4 bg-gray-700 rounded-xl hover:bg-gray-600 text-left">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-secondary mb-2" />
+            <p className="font-medium text-white text-sm">Campaign</p>
             <p className="text-xs text-gray-400">Urgent appeal</p>
           </button>
         </div>
@@ -945,61 +919,61 @@ const Admin = () => {
   )
 
   const Reports = () => (
-    <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-      <h3 className="text-lg font-bold mb-6 text-white">Reports & Export</h3>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="border border-gray-700 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green-500" />
+    <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+      <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-white">Reports & Export</h3>
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="border border-gray-700 rounded-xl p-3 sm:p-4 hover:bg-gray-700/50 transition-colors">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             </div>
-            <div>
-              <p className="font-bold text-white">Donations Report</p>
-              <p className="text-xs text-gray-400">Export all donations</p>
+            <div className="min-w-0">
+              <p className="font-bold text-white text-sm sm:text-base truncate">Donations</p>
+              <p className="text-xs text-gray-400 hidden sm:block">Export CSV</p>
             </div>
           </div>
-          <button onClick={exportDonations} className="w-full px-3 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 flex items-center justify-center gap-1">
-            <Download className="w-4 h-4" /> Export CSV
+          <button onClick={exportDonations} className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-green-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-green-600 flex items-center justify-center gap-1">
+            <Download className="w-3 h-3 sm:w-4 sm:h-4" /> Export
           </button>
         </div>
-        <div className="border border-gray-700 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <UsersIcon className="w-5 h-5 text-blue-500" />
+        <div className="border border-gray-700 rounded-xl p-3 sm:p-4 hover:bg-gray-700/50 transition-colors">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
-            <div>
-              <p className="font-bold text-white">Donors Report</p>
-              <p className="text-xs text-gray-400">Export all donors</p>
+            <div className="min-w-0">
+              <p className="font-bold text-white text-sm sm:text-base truncate">Donors</p>
+              <p className="text-xs text-gray-400 hidden sm:block">Export CSV</p>
             </div>
           </div>
-          <button onClick={async () => { toast.success('Export feature coming soon!') }} className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 flex items-center justify-center gap-1">
-            <Download className="w-4 h-4" /> Export CSV
+          <button onClick={() => toast.success('Coming soon!')} className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-600 flex items-center justify-center gap-1">
+            <Download className="w-3 h-3 sm:w-4 sm:h-4" /> Export
           </button>
         </div>
-        <div className="border border-gray-700 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <BarChart className="w-5 h-5 text-purple-500" />
+        <div className="border border-gray-700 rounded-xl p-3 sm:p-4 hover:bg-gray-700/50 transition-colors">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
             </div>
-            <div>
-              <p className="font-bold text-white">Analytics Report</p>
-              <p className="text-xs text-gray-400">Full analytics export</p>
+            <div className="min-w-0">
+              <p className="font-bold text-white text-sm sm:text-base truncate">Analytics</p>
+              <p className="text-xs text-gray-400 hidden sm:block">View charts</p>
             </div>
           </div>
-          <button onClick={() => setActiveTab('analytics')} className="w-full px-3 py-2 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 flex items-center justify-center gap-1">
-            <Eye className="w-4 h-4" /> View Analytics
+          <button onClick={() => setActiveTab('analytics')} className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-purple-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-600 flex items-center justify-center gap-1">
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4" /> View
           </button>
         </div>
       </div>
       
       {stats?.monthlyDonations?.length > 0 && (
-        <div className="p-6 bg-gray-700/50 rounded-xl">
-          <h4 className="font-bold mb-4 text-white">Monthly Donation Summary</h4>
+        <div className="p-4 sm:p-6 bg-gray-700/50 rounded-xl">
+          <h4 className="font-bold mb-3 sm:mb-4 text-white text-sm sm:text-base">Monthly Summary</h4>
           <div className="space-y-2">
             {stats.monthlyDonations.map((m, i) => (
-              <div key={i} className="flex justify-between text-sm">
+              <div key={i} className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-400">{m._id}</span>
-                <span className="font-bold text-secondary">{formatCurrency(m.total)} ({m.count} donations)</span>
+                <span className="font-bold text-secondary">{formatCurrency(m.total)} ({m.count})</span>
               </div>
             ))}
           </div>
@@ -1009,35 +983,35 @@ const Admin = () => {
   )
 
   const Transparency = () => (
-    <div className="space-y-6">
-      <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-        <h3 className="text-lg font-bold mb-6 text-white">Fund Allocation</h3>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
+        <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-white">Fund Allocation</h3>
         {stats?.programBreakdown?.length > 0 ? (
           <>
-            <div className="grid sm:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
               {stats.programBreakdown.map((item, i) => {
                 const colors = ['from-blue-500 to-blue-600', 'from-red-500 to-red-600', 'from-purple-500 to-purple-600', 'from-green-500 to-green-600']
                 return (
                   <div key={i} className="text-center">
-                    <div className={`w-16 h-16 mx-auto bg-gradient-to-br ${colors[i % colors.length]} rounded-2xl flex items-center justify-center mb-2`}>
-                      <span className="text-white font-bold text-lg">{Math.round((item.total / stats.totalDonations) * 100)}%</span>
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-gradient-to-br ${colors[i % colors.length]} rounded-xl sm:rounded-2xl flex items-center justify-center mb-2`}>
+                      <span className="text-white font-bold text-sm sm:text-lg">{Math.round((item.total / stats.totalDonations) * 100)}%</span>
                     </div>
-                    <p className="text-sm font-medium text-white">{item._id}</p>
+                    <p className="text-xs sm:text-sm font-medium text-white truncate">{item._id}</p>
                     <p className="text-xs text-gray-400">{formatCurrency(item.total)}</p>
                   </div>
                 )
               })}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {stats.programBreakdown.map((item, i) => {
                 const colors = ['bg-blue-500', 'bg-red-500', 'bg-purple-500', 'bg-green-500']
                 return (
-                  <div key={i} className="flex items-center space-x-4">
-                    <span className="w-24 text-sm font-medium text-gray-400">{item._id}</span>
-                    <div className="flex-1 h-4 bg-gray-700 rounded-full overflow-hidden">
+                  <div key={i} className="flex items-center gap-2 sm:gap-4">
+                    <span className="w-16 sm:w-24 text-xs sm:text-sm font-medium text-gray-400 truncate">{item._id}</span>
+                    <div className="flex-1 h-3 sm:h-4 bg-gray-700 rounded-full overflow-hidden">
                       <div className={`h-full ${colors[i % colors.length]} rounded-full`} style={{ width: `${(item.total / stats.totalDonations) * 100}%` }}></div>
                     </div>
-                    <span className="w-12 text-sm font-bold text-secondary text-right">{Math.round((item.total / stats.totalDonations) * 100)}%</span>
+                    <span className="w-12 text-xs sm:text-sm font-bold text-secondary text-right flex-shrink-0">{Math.round((item.total / stats.totalDonations) * 100)}%</span>
                   </div>
                 )
               })}
@@ -1051,16 +1025,38 @@ const Admin = () => {
   )
 
   return (
-    <div className="min-h-screen bg-black flex">
-      <aside className={`fixed lg:static inset-y-0 left-0 bg-gray-900 shadow-xl transform transition-all duration-300 z-50 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarCollapsed ? 'w-20' : 'w-72'} border-r border-gray-800`}>
-        <div className="p-6 border-b border-gray-800 flex items-center justify-between">
+    <div className="min-h-screen bg-black flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-gray-900 border-b border-gray-800 p-4 flex items-center justify-between sticky top-0 z-40">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded-lg text-gray-400">
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="w-8 h-8 bg-gradient-to-br from-secondary to-yellow-500 rounded-lg flex items-center justify-center">
+            <Shield className="w-4 h-4 text-black" />
+          </div>
+        </div>
+        <h1 className="text-lg font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard' : activeTab}</h1>
+        <button onClick={() => { fetchStats(); fetchAnalytics() }} className="p-2 hover:bg-gray-800 rounded-lg text-gray-400">
+          <RefreshCw className="w-5 h-5" />
+        </button>
+      </header>
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/70 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 bg-gray-900 shadow-xl transform transition-all duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarCollapsed ? 'w-20' : 'w-72'} border-r border-gray-800 flex-shrink-0`}>
+        <div className="p-4 border-b border-gray-800 flex items-center justify-between">
           {!sidebarCollapsed && (
             <Link to="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-secondary to-yellow-500 rounded-xl flex items-center justify-center">
                 <Shield className="w-5 h-5 text-black" />
               </div>
               <div>
-                <p className="font-bold text-secondary">Admin</p>
+                <p className="font-bold text-secondary text-sm">Admin</p>
                 <p className="text-xs text-gray-400">Panel</p>
               </div>
             </Link>
@@ -1072,60 +1068,46 @@ const Admin = () => {
           )}
         </div>
 
-        <nav className="p-4 space-y-1">
+        <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
           {menuItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${sidebarCollapsed ? 'justify-center' : ''} ${
+              onClick={() => { setActiveTab(item.id); setSidebarOpen(false) }}
+              className={`w-full flex items-center space-x-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-colors ${sidebarCollapsed ? 'justify-center' : ''} ${
                 activeTab === item.id ? 'bg-secondary text-black' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
               title={sidebarCollapsed ? item.label : ''}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
-              {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+              {!sidebarCollapsed && <span className="font-medium text-sm truncate">{item.label}</span>}
             </button>
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-          {!sidebarCollapsed && (
-            <Link to="/" className="flex items-center space-x-3 px-4 py-2 text-gray-400 hover:text-white mb-2">
-              <Eye className="w-5 h-5" />
-              <span className="text-sm">View Website</span>
-            </Link>
-          )}
-          <button onClick={handleLogout} className={`w-full flex items-center space-x-3 px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-xl ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            <LogOut className="w-5 h-5" />
-            {!sidebarCollapsed && <span className="font-medium">Logout</span>}
+        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-800 space-y-1">
+          <Link to="/" className={`flex items-center space-x-3 px-3 sm:px-4 py-2 text-gray-400 hover:text-white rounded-lg ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <Eye className="w-5 h-5 flex-shrink-0" />
+            {!sidebarCollapsed && <span className="text-sm">View Website</span>}
+          </Link>
+          <button onClick={handleLogout} className={`w-full flex items-center space-x-3 px-3 sm:px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-lg ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {!sidebarCollapsed && <span className="text-sm font-medium">Logout</span>}
           </button>
         </div>
       </aside>
 
-      {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+      {/* Desktop Header */}
+      <div className="hidden lg:block absolute top-0 right-0 left-72 p-4 z-30">
+        <div className="flex items-center justify-end">
+          <button onClick={fetchStats} className="p-2 hover:bg-gray-800 rounded-lg text-gray-400" title="Refresh">
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-gray-900 shadow-sm p-4 lg:p-6 flex items-center justify-between border-b border-gray-800">
-          <div className="flex items-center space-x-4">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 hover:bg-gray-800 rounded-lg text-gray-400">
-              <Menu className="w-6 h-6" />
-            </button>
-            <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="hidden lg:block p-2 hover:bg-gray-800 rounded-lg text-gray-400">
-              {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-            </button>
-            <div>
-              <h1 className="text-xl font-bold text-white capitalize">{activeTab === 'dashboard' ? 'Dashboard' : activeTab}</h1>
-              <p className="text-sm text-gray-400">Welcome back, {user?.name}</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button onClick={() => { fetchStats(); fetchAnalytics() }} className="p-2 hover:bg-gray-800 rounded-lg text-gray-400" title="Refresh">
-              <RefreshCw className="w-5 h-5" />
-            </button>
-          </div>
-        </header>
-
-        <main className="p-4 lg:p-6 flex-1 overflow-auto">
+        <main className="flex-1 p-4 sm:p-6 overflow-auto">
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'donations' && <Donations />}
           {activeTab === 'donors' && <Donors />}
@@ -1140,62 +1122,64 @@ const Admin = () => {
         </main>
       </div>
 
+      {/* Broadcast Modal */}
       {showModal === 'broadcast' && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 w-full max-w-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-md border border-gray-700 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-white">Send Broadcast</h3>
-              <button onClick={() => setShowModal(null)} className="p-2 hover:bg-gray-700 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+              <h3 className="text-base sm:text-lg font-bold text-white">Send Broadcast</h3>
+              <button onClick={() => setShowModal(null)} className="p-1.5 hover:bg-gray-700 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleBroadcast} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Target Audience</label>
-                <select value={broadcastForm.target} onChange={(e) => setBroadcastForm({ ...broadcastForm, target: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white">
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Target</label>
+                <select value={broadcastForm.target} onChange={(e) => setBroadcastForm({ ...broadcastForm, target: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm">
                   <option value="all">All Users</option>
                   <option value="donors">All Donors</option>
                   <option value="admin">Admins Only</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Subject</label>
-                <input type="text" value={broadcastForm.subject} onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Subject</label>
+                <input type="text" value={broadcastForm.subject} onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Message</label>
-                <textarea value={broadcastForm.message} onChange={(e) => setBroadcastForm({ ...broadcastForm, message: e.target.value })} rows={5} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Message</label>
+                <textarea value={broadcastForm.message} onChange={(e) => setBroadcastForm({ ...broadcastForm, message: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="flex-1 px-6 py-3 bg-secondary text-black rounded-lg font-semibold">Send Broadcast</button>
-                <button type="button" onClick={() => setShowModal(null)} className="px-6 py-3 bg-gray-700 text-white rounded-lg">Cancel</button>
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+                <button type="submit" className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-secondary text-black rounded-lg font-semibold text-sm">Send</button>
+                <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-white rounded-lg text-sm">Cancel</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* Email Modal */}
       {showModal === 'email' && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 w-full max-w-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-md border border-gray-700 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-white">Send Email</h3>
-              <button onClick={() => setShowModal(null)} className="p-2 hover:bg-gray-700 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
+              <h3 className="text-base sm:text-lg font-bold text-white">Send Email</h3>
+              <button onClick={() => setShowModal(null)} className="p-1.5 hover:bg-gray-700 rounded-lg text-gray-400"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSendEmail} className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">To</label>
-                <input type="email" value={emailForm.to} onChange={(e) => setEmailForm({ ...emailForm, to: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">To</label>
+                <input type="email" value={emailForm.to} onChange={(e) => setEmailForm({ ...emailForm, to: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Subject</label>
-                <input type="text" value={emailForm.subject} onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Subject</label>
+                <input type="text" value={emailForm.subject} onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Message</label>
-                <textarea value={emailForm.message} onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })} rows={5} className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white" required />
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Message</label>
+                <textarea value={emailForm.message} onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="flex-1 px-6 py-3 bg-secondary text-black rounded-lg font-semibold">Send</button>
-                <button type="button" onClick={() => setShowModal(null)} className="px-6 py-3 bg-gray-700 text-white rounded-lg">Cancel</button>
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+                <button type="submit" className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-secondary text-black rounded-lg font-semibold text-sm">Send</button>
+                <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-white rounded-lg text-sm">Cancel</button>
               </div>
             </form>
           </div>
