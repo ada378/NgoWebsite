@@ -1,14 +1,23 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Shield, Lock, Mail, Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  baseURL: import.meta.env.VITE_API_URL || '/api'
 })
 
 const AdminLogin = () => {
+  const navigate = useNavigate()
+  const existingToken = localStorage.getItem('token')
+  const existingUser = JSON.parse(localStorage.getItem('adminUser') || 'null')
+  
+  if (existingToken && existingUser?.role === 'admin') {
+    navigate('/admin', { replace: true })
+    return null
+  }
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +41,7 @@ const AdminLogin = () => {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('adminUser', JSON.stringify(response.data.user))
       toast.success('Admin login successful!')
-      window.location.href = '/admin'
+      navigate('/admin', { replace: true })
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please check your credentials.')
     }

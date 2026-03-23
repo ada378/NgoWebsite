@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { BarChart3, Users as UsersIcon, DollarSign, FileText, Settings, LogOut, Heart, Award, LayoutDashboard, Menu, Eye, Download, Shield, ChevronLeft, ChevronRight, RefreshCw, Plus, Edit, Trash2, Mail, Send, CheckCircle, XCircle, AlertCircle, TrendingUp, BarChart, PieChart, Activity, X, Search, Filter, EyeOff, Check, Clock } from 'lucide-react'
+import { BarChart3, Users as UsersIcon, DollarSign, FileText, Settings, LogOut, Heart, Award, LayoutDashboard, Menu, Download, Shield, ChevronLeft, ChevronRight, RefreshCw, Plus, Edit, Trash2, Mail, Send, CheckCircle, XCircle, AlertCircle, TrendingUp, BarChart, PieChart, Activity, X, Search, Filter, EyeOff, Check, Clock, CreditCard, Smartphone, Building2 } from 'lucide-react'
 import { BarChart as RechartsBar, Bar, LineChart, Line, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import AdminLogin from './AdminLogin'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  baseURL: import.meta.env.VITE_API_URL || '/api'
 })
+
+const uploadImage = async (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await api.post('/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data.file.url
+}
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
@@ -160,7 +169,7 @@ const Admin = () => {
   const handleDeleteProgram = async (id) => {
     if (!confirm('Are you sure you want to delete this program?')) return
     try {
-      await api.delete(`/programs/${id}`)
+      await api.delete(`/api/programs/${id}`)
       toast.success('Program deleted')
       fetchPrograms()
     } catch (err) { toast.error('Delete failed') }
@@ -169,7 +178,7 @@ const Admin = () => {
   const handleDeleteBlog = async (id) => {
     if (!confirm('Are you sure you want to delete this blog?')) return
     try {
-      await api.delete(`/blogs/${id}`)
+      await api.delete(`/api/blogs/${id}`)
       toast.success('Blog deleted')
       fetchBlogs()
     } catch (err) { toast.error('Delete failed') }
@@ -178,7 +187,7 @@ const Admin = () => {
   const handleDeleteUser = async (id) => {
     if (!confirm('Are you sure you want to delete this user?')) return
     try {
-      await api.delete(`/admin/users/${id}`)
+      await api.delete(`/api/admin/users/${id}`)
       toast.success('User deleted')
       fetchUsers()
     } catch (err) { toast.error('Delete failed') }
@@ -186,7 +195,7 @@ const Admin = () => {
 
   const handleVerifyDonation = async (id, status) => {
     try {
-      await api.post(`/admin/verify-donation/${id}`, { status })
+      await api.post(`/api/admin/verify-donation/${id}`, { status })
       toast.success(`Donation ${status}`)
       fetchDonations()
       fetchStats()
@@ -215,7 +224,7 @@ const Admin = () => {
 
   const handleUpdateUser = async (id, role) => {
     try {
-      await api.put(`/admin/users/${id}`, { role })
+      await api.put(`/api/admin/users/${id}`, { role })
       toast.success('User role updated')
       fetchUsers()
       setShowModal(null)
@@ -236,6 +245,7 @@ const Admin = () => {
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'donate', icon: Heart, label: 'Donate' },
     { id: 'donations', icon: DollarSign, label: 'Donations' },
     { id: 'donors', icon: UsersIcon, label: 'Donors' },
     { id: 'programs', icon: Heart, label: 'Programs' },
@@ -244,7 +254,7 @@ const Admin = () => {
     { id: 'certificates', icon: Award, label: 'Certificates' },
     { id: 'analytics', icon: BarChart, label: 'Analytics' },
     { id: 'email', icon: Mail, label: 'Email' },
-    { id: 'transparency', icon: Eye, label: 'Transparency' },
+    { id: 'transparency', icon: Activity, label: 'Transparency' },
     { id: 'reports', icon: FileText, label: 'Reports' },
   ]
 
@@ -343,6 +353,182 @@ const Admin = () => {
       )}
     </div>
   )
+
+  const DonateSection = ({ user }) => {
+    const [step, setStep] = useState(1)
+    const [loading, setLoading] = useState(false)
+    const [selectedAmount, setSelectedAmount] = useState(1000)
+    const [customAmount, setCustomAmount] = useState('')
+    const [formData, setFormData] = useState({ donorName: user?.name || '', email: user?.email || '', phone: '', program: 'General', message: '', anonymous: false })
+    const [paymentMethod, setPaymentMethod] = useState('UPI')
+    const [donationResult, setDonationResult] = useState(null)
+
+    const amounts = [500, 1000, 2500, 5000, 10000]
+    const paymentMethods = [
+      { id: 'UPI', icon: Smartphone, label: 'UPI' },
+      { id: 'Card', icon: CreditCard, label: 'Card' },
+      { id: 'Net Banking', icon: Building2, label: 'Net Banking' }
+    ]
+    const programs = ['Education', 'Healthcare', 'Women Empowerment', 'Environment', 'General']
+    const finalAmount = customAmount ? parseInt(customAmount) : selectedAmount
+
+    const handleSubmit = (e) => {
+      e.preventDefault()
+      if (!formData.donorName || !formData.email) { toast.error('Please fill required fields'); return }
+      if (finalAmount < 100) { toast.error('Minimum donation is ₹100'); return }
+      setStep(2)
+    }
+
+    const handlePayment = async () => {
+      setLoading(true)
+      let donationId = 'DEMO-' + Date.now()
+      
+      try {
+        const response = await api.post('/donations', {
+          donorName: formData.anonymous ? 'Anonymous' : formData.donorName,
+          donorEmail: formData.email,
+          amount: finalAmount,
+          paymentMethod,
+          program: formData.program,
+          message: formData.message,
+          anonymous: formData.anonymous
+        })
+        donationId = response.data.donation?.id || donationId
+        
+        setDonationResult({ donationId, amount: finalAmount, receiptNumber: `HF${Date.now().toString().slice(-8)}`, certificateId: `CERT${Date.now()}` })
+        setStep(3)
+        toast.success('Donation successful!')
+        
+        try {
+          await api.post('/certificates/generate', { donationId, type: 'donation' })
+        } catch {}
+        
+        fetchStats()
+      } catch (error) {
+        toast.error('Donation failed. Please try again.')
+      }
+      setLoading(false)
+    }
+
+    const processDemoPayment = async () => {
+      await handlePayment()
+    }
+
+    if (step === 3 && donationResult) {
+      return (
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 text-center">
+            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-green-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Thank You!</h2>
+            <p className="text-gray-400 mb-6">Your donation of ₹{donationResult.amount.toLocaleString()} has been received.</p>
+            <div className="bg-gray-700/50 rounded-xl p-4 mb-6 text-left">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><span className="text-gray-400">Receipt No:</span><p className="text-white font-mono">{donationResult.receiptNumber}</p></div>
+                <div><span className="text-gray-400">Certificate ID:</span><p className="text-white font-mono">{donationResult.certificateId}</p></div>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <button onClick={() => { setStep(1); setDonationResult(null) }} className="flex-1 py-3 bg-gray-700 text-white rounded-xl font-semibold hover:bg-gray-600">Donate Again</button>
+              <button onClick={() => { setActiveTab('certificates'); setStep(1); setDonationResult(null) }} className="flex-1 py-3 bg-secondary text-black rounded-xl font-semibold">View Certificates</button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-2">Make a Donation</h2>
+          <p className="text-gray-400">Your contribution makes a difference</p>
+        </div>
+
+        {step === 1 ? (
+          <form onSubmit={handleSubmit} className="bg-gray-800 rounded-2xl p-6 border border-gray-700 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-3">Select Amount</label>
+              <div className="grid grid-cols-5 gap-2 mb-4">
+                {amounts.map((amt) => (
+                  <button key={amt} type="button" onClick={() => { setSelectedAmount(amt); setCustomAmount('') }} className={`py-3 rounded-xl font-semibold text-sm transition-all ${selectedAmount === amt && !customAmount ? 'bg-secondary text-black' : 'bg-gray-700 text-white hover:bg-gray-600'}`}>₹{amt}</button>
+                ))}
+              </div>
+              <input type="number" value={customAmount} onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(0) }} placeholder="Custom amount" className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-secondary focus:outline-none" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Donor Name</label>
+              <input type="text" value={formData.donorName} onChange={(e) => setFormData({ ...formData, donorName: e.target.value })} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:border-secondary focus:outline-none" required />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:border-secondary focus:outline-none" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Phone (Optional)</label>
+                <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:border-secondary focus:outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Program</label>
+              <select value={formData.program} onChange={(e) => setFormData({ ...formData, program: e.target.value })} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:border-secondary focus:outline-none">
+                {programs.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Message (Optional)</label>
+              <textarea value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} rows={3} className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:border-secondary focus:outline-none resize-none" />
+            </div>
+
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" checked={formData.anonymous} onChange={(e) => setFormData({ ...formData, anonymous: e.target.checked })} className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-secondary focus:ring-secondary" />
+              <span className="text-gray-400 text-sm">Make this donation anonymous</span>
+            </label>
+
+            <button type="submit" className="w-full py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-secondary/30 transition-all">
+              Continue to Payment
+            </button>
+          </form>
+        ) : (
+          <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700 space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-white">Payment</h3>
+              <button onClick={() => setStep(1)} className="text-gray-400 hover:text-white text-sm">← Edit</button>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-xl p-4">
+              <p className="text-gray-400 text-sm">Amount</p>
+              <p className="text-3xl font-bold text-secondary">₹{finalAmount.toLocaleString()}</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-3">Payment Method</label>
+              <div className="grid grid-cols-3 gap-3">
+                {paymentMethods.map((m) => (
+                  <button key={m.id} type="button" onClick={() => setPaymentMethod(m.id)} className={`py-4 rounded-xl font-medium text-sm transition-all flex flex-col items-center gap-2 ${paymentMethod === m.id ? 'bg-secondary text-black' : 'bg-gray-700 text-white hover:bg-gray-600'}`}>
+                    <m.icon className="w-6 h-6" />
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button onClick={() => setStep(1)} className="flex-1 py-4 bg-gray-700 text-white font-bold rounded-xl hover:bg-gray-600">Back</button>
+              <button onClick={handlePayment} disabled={loading} className="flex-1 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold rounded-xl hover:shadow-lg hover:shadow-secondary/30 flex items-center justify-center gap-2 disabled:opacity-50">
+                {loading ? <><RefreshCw className="w-5 h-5 animate-spin" /> Processing...</> : 'Pay Now'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const Donations = () => (
     <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
@@ -455,13 +641,32 @@ const Admin = () => {
 
   const Programs = () => {
     const [showForm, setShowForm] = useState(false)
-    const [formData, setFormData] = useState({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active' })
+    const [uploading, setUploading] = useState(false)
+    const [formData, setFormData] = useState({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active', images: [] })
+
+    const handleImageUpload = async (e) => {
+      const files = Array.from(e.target.files)
+      if (files.length === 0) return
+      setUploading(true)
+      try {
+        const uploadedImages = await Promise.all(files.map(file => uploadImage(file)))
+        setFormData(prev => ({ ...prev, images: [...prev.images, ...uploadedImages] }))
+        toast.success('Image(s) uploaded!')
+      } catch (err) {
+        toast.error('Upload failed')
+      }
+      setUploading(false)
+    }
+
+    const removeImage = (index) => {
+      setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }))
+    }
 
     const handleSubmit = async (e) => {
       e.preventDefault()
       try {
         if (editData?._id) {
-          await api.put(`/programs/${editData._id}`, formData)
+          await api.put(`/api/programs/${editData._id}`, formData)
           toast.success('Program updated')
         } else {
           await api.post('/programs', formData)
@@ -470,7 +675,7 @@ const Admin = () => {
         fetchPrograms()
         setShowForm(false)
         setEditData(null)
-        setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active' })
+        setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active', images: [] })
       } catch (err) { toast.error('Failed to save program') }
     }
 
@@ -484,7 +689,7 @@ const Admin = () => {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <h3 className="text-base sm:text-lg font-bold text-white">Programs Management</h3>
-          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active' }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
+          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', description: '', category: 'Education', icon: 'book', impactStats: { livesImpacted: 0, projectsCompleted: 0, volunteers: 0 }, goals: { target: 0, raised: 0 }, features: [], status: 'active', images: [] }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
             <Plus className="w-4 h-4" /> <span className="hidden xs:inline">Add</span> Program
           </button>
         </div>
@@ -511,6 +716,19 @@ const Admin = () => {
               <div>
                 <label className="block text-xs sm:text-sm text-gray-400 mb-1">Description</label>
                 <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Images</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.images?.map((img, i) => (
+                    <div key={i} className="relative group">
+                      <img src={img} alt="" className="w-20 h-20 object-cover rounded-lg" />
+                      <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">X</button>
+                    </div>
+                  ))}
+                </div>
+                <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={uploading} className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-secondary file:text-black file:text-sm file:font-semibold" />
+                {uploading && <p className="text-xs text-secondary mt-1">Uploading...</p>}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div>
@@ -575,14 +793,33 @@ const Admin = () => {
 
   const Blogs = () => {
     const [showForm, setShowForm] = useState(false)
-    const [formData, setFormData] = useState({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true })
+    const [uploading, setUploading] = useState(false)
+    const [formData, setFormData] = useState({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true, images: [] })
+
+    const handleImageUpload = async (e) => {
+      const files = Array.from(e.target.files)
+      if (files.length === 0) return
+      setUploading(true)
+      try {
+        const uploadedImages = await Promise.all(files.map(file => uploadImage(file)))
+        setFormData(prev => ({ ...prev, images: [...prev.images, ...uploadedImages] }))
+        toast.success('Image(s) uploaded!')
+      } catch (err) {
+        toast.error('Upload failed')
+      }
+      setUploading(false)
+    }
+
+    const removeImage = (index) => {
+      setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }))
+    }
 
     const handleSubmit = async (e) => {
       e.preventDefault()
       try {
         const data = { ...formData, tags: formData.tags.split(',').map(t => t.trim()) }
         if (editData?._id) {
-          await api.put(`/blogs/${editData._id}`, data)
+          await api.put(`/api/blogs/${editData._id}`, data)
           toast.success('Blog updated')
         } else {
           await api.post('/blogs', data)
@@ -591,7 +828,7 @@ const Admin = () => {
         fetchBlogs()
         setShowForm(false)
         setEditData(null)
-        setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true })
+        setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true, images: [] })
       } catch (err) { toast.error('Failed to save blog') }
     }
 
@@ -605,7 +842,7 @@ const Admin = () => {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <h3 className="text-base sm:text-lg font-bold text-white">Blog Management</h3>
-          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
+          <button onClick={() => { setShowForm(true); setEditData(null); setFormData({ title: '', content: '', excerpt: '', category: 'News', authorName: 'Admin', tags: '', featured: false, published: true, images: [] }) }} className="px-3 sm:px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2 text-sm">
             <Plus className="w-4 h-4" /> <span className="hidden xs:inline">Add</span> Blog
           </button>
         </div>
@@ -637,6 +874,19 @@ const Admin = () => {
               <div>
                 <label className="block text-xs sm:text-sm text-gray-400 mb-1">Content</label>
                 <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={4} className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm" required />
+              </div>
+              <div>
+                <label className="block text-xs sm:text-sm text-gray-400 mb-1">Images</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.images?.map((img, i) => (
+                    <div key={i} className="relative group">
+                      <img src={img} alt="" className="w-20 h-20 object-cover rounded-lg" />
+                      <button type="button" onClick={() => removeImage(i)} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">X</button>
+                    </div>
+                  ))}
+                </div>
+                <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={uploading} className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-secondary file:text-black file:text-sm file:font-semibold" />
+                {uploading && <p className="text-xs text-secondary mt-1">Uploading...</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -1085,10 +1335,6 @@ const Admin = () => {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-800 space-y-1">
-          <Link to="/" className={`flex items-center space-x-3 px-3 sm:px-4 py-2 text-gray-400 hover:text-white rounded-lg ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            <Eye className="w-5 h-5 flex-shrink-0" />
-            {!sidebarCollapsed && <span className="text-sm">View Website</span>}
-          </Link>
           <button onClick={handleLogout} className={`w-full flex items-center space-x-3 px-3 sm:px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-lg ${sidebarCollapsed ? 'justify-center' : ''}`}>
             <LogOut className="w-5 h-5 flex-shrink-0" />
             {!sidebarCollapsed && <span className="text-sm font-medium">Logout</span>}
@@ -1109,6 +1355,7 @@ const Admin = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <main className="flex-1 p-4 sm:p-6 overflow-auto">
           {activeTab === 'dashboard' && <Dashboard />}
+          {activeTab === 'donate' && <DonateSection user={user} />}
           {activeTab === 'donations' && <Donations />}
           {activeTab === 'donors' && <Donors />}
           {activeTab === 'programs' && <Programs />}

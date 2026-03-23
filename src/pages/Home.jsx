@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
-import { Heart, Users, GraduationCap, Activity, TreePine, Shield, Award, ArrowRight, ChevronRight, CheckCircle, Star, Quote, Target, Eye, Mail, Send, Play, PlayCircle, Calendar, MapPin, Phone, Video } from 'lucide-react'
+import { Heart, Users, GraduationCap, Activity, TreePine, Shield, Award, ArrowRight, ChevronRight, CheckCircle, Star, Quote, Target, Eye, Mail, Send, Play, PlayCircle, Calendar, MapPin, Phone, Video, Sparkles, Globe, TrendingUp } from 'lucide-react'
 import axios from 'axios'
 
 const FadeInSection = ({ children, delay = 0, className = '' }) => {
@@ -35,7 +35,7 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '', prefix = '' }) => 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setIsVisible(true) },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     )
     if (ref.current) observer.observe(ref.current)
     return () => observer.disconnect()
@@ -54,7 +54,7 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '', prefix = '' }) => 
   }, [isVisible, end, duration])
 
   return (
-    <span ref={ref} className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-secondary">
+    <span ref={ref} className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-secondary to-yellow-400 bg-clip-text text-transparent">
       {prefix}{count.toLocaleString()}{suffix}
     </span>
   )
@@ -63,10 +63,38 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '', prefix = '' }) => 
 const Home = () => {
   const [programs, setPrograms] = useState([])
   const [loaded, setLoaded] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  const heroSlides = [
+    {
+      image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop',
+      title: 'Creating Lasting Change',
+      subtitle: 'Empowering communities through education, healthcare & sustainable development'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=1080&fit=crop',
+      title: 'Education for Every Child',
+      subtitle: 'Building schools and providing scholarships to underprivileged children'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&h=1080&fit=crop',
+      title: 'Healthcare for All',
+      subtitle: 'Extending quality healthcare services to rural communities'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&h=1080&fit=crop',
+      title: 'Empowering Women',
+      subtitle: 'Creating self-reliant communities through skill development'
+    }
+  ]
 
   useEffect(() => {
     fetchData()
     setLoaded(true)
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   const fetchData = async () => {
@@ -84,7 +112,7 @@ const Home = () => {
   }
 
   const programIcons = { 'Education': GraduationCap, 'Healthcare': Activity, 'Women Empowerment': Users, 'Environment': TreePine }
-  const programColors = { 'Education': 'from-blue-500 to-blue-600', 'Healthcare': 'from-red-500 to-red-600', 'Women Empowerment': 'from-purple-500 to-purple-600', 'Environment': 'from-emerald-500 to-emerald-600' }
+  const programColors = { 'Education': 'from-blue-600 to-blue-700', 'Healthcare': 'from-red-600 to-red-700', 'Women Empowerment': 'from-purple-600 to-purple-700', 'Environment': 'from-emerald-600 to-emerald-700' }
 
   const testimonials = [
     { name: 'Priya S.', role: 'Regular Donor', text: 'Hope Foundation has completely transformed lives. I\'ve seen schools they built.', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face', rating: 5 },
@@ -107,96 +135,118 @@ const Home = () => {
   ]
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-16 md:pt-20">
+    <div className="min-h-screen overflow-hidden">
+      {/* Premium Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop" alt="Hope Foundation" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90"></div>
+          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop" alt="Hope Foundation" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 via-black/85 to-black"></div>
+        </div>
+        
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28 text-center">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 text-center">
           <div className={`${loaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
-            <p className="text-secondary font-semibold tracking-widest uppercase text-xs sm:text-sm mb-3 sm:mb-6">Hope Foundation • Since 2010</p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 mb-6">
+              <Sparkles className="w-4 h-4 text-secondary" />
+              <span className="text-secondary font-medium text-sm">Hope Foundation • Since 2010</span>
+            </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-white mb-4 sm:mb-6 md:mb-8 leading-tight">
-              <span className="text-secondary">Hope</span> & <span className="text-secondary">Impact</span>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+                Creating
+              </span>
+              <br />
+              <span className="text-white">Lasting </span>
+              <span className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary bg-clip-text text-transparent">Change</span>
             </h1>
             
-            <p className="text-gray-400 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed px-2 sm:px-4">
-              Empowering communities through education, healthcare & sustainable development.
+            <p className="text-gray-400 text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed px-4">
+              Empowering communities through education, healthcare & sustainable development. 
+              <span className="text-secondary font-medium"> Every donation creates ripples of positive change.</span>
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-6 px-4 sm:px-0">
-              <Link to="/donate" className="w-full sm:w-auto min-w-[160px] sm:min-w-[180px] px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-black font-bold rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Donate Now</span>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 px-4">
+              <Link to="/donate" className="group relative w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold text-lg rounded-xl overflow-hidden shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition-all duration-300 hover:-translate-y-1">
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative flex items-center justify-center gap-3">
+                  <Heart className="w-5 h-5" />
+                  Donate Now
+                </span>
               </Link>
-              <Link to="/programs" className="w-full sm:w-auto min-w-[160px] sm:min-w-[180px] px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-500 text-white font-bold rounded-xl hover:border-secondary hover:text-secondary transition-all text-sm sm:text-base">
-                Our Programs
+              <Link to="/programs" className="group w-full sm:w-auto px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/20 text-white font-semibold text-lg rounded-xl hover:bg-white/10 hover:border-secondary/50 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-1">
+                <Globe className="w-5 h-5" />
+                Explore Programs
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 md:gap-10 mt-10 sm:mt-16 md:mt-20 text-center px-4 sm:px-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-16 md:mt-24 px-4">
               {impactStats.map((stat, i) => (
-                <div key={i} className="bg-black/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none rounded-xl sm:rounded-none p-3 sm:p-0 border border-gray-800 sm:border-0">
-                  <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">{stat.value.toLocaleString()}{stat.suffix}</p>
-                  <p className="text-gray-500 text-xs sm:text-sm mt-1">{stat.label}</p>
+                <div key={i} className="group relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                  <div className="relative">
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gradient mb-2">{stat.value.toLocaleString()}{stat.suffix}</p>
+                    <p className="text-gray-400 text-sm md:text-base">{stat.label}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden sm:flex">
-          <div className="w-6 h-10 border-2 border-gray-500 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-3 bg-gray-500 rounded-full"></div>
-          </div>
-        </div>
+
       </section>
 
       {/* About Section */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-20" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <FadeInSection>
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-secondary/20 to-transparent rounded-3xl blur-2xl opacity-50" />
+                <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&h=600&fit=crop" alt="Volunteers" className="relative rounded-2xl w-full shadow-2xl" />
+                <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 bg-gradient-to-br from-secondary to-yellow-500 text-black p-6 md:p-8 rounded-2xl shadow-2xl shadow-secondary/30">
+                  <p className="text-3xl md:text-4xl font-display font-bold">14+</p>
+                  <p className="text-sm font-medium">Years of Impact</p>
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={200}>
               <div>
-                <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Who We Are</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-6">A Force for Good Since 2010</h2>
-                <p className="text-gray-400 leading-relaxed mb-6">
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-6">
+                  <Award className="w-4 h-4" />
+                  About Us
+                </span>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
+                  A Force for Good
+                  <span className="block text-gradient">Since 2010</span>
+                </h2>
+                <p className="text-gray-400 leading-relaxed mb-6 text-lg">
                   Hope Foundation has been at the forefront of social change, working tirelessly to transform lives across India. Our commitment to transparency, accountability, and impact-driven work has earned us the trust of thousands.
                 </p>
                 <p className="text-gray-400 leading-relaxed mb-8">
                   Every donation is tracked, every rupee accounted for, and every life touched is a testament to our mission of creating a more equitable world.
                 </p>
-                <div className="grid grid-cols-2 gap-4 sm:gap-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="group p-4 bg-white/5 rounded-xl border border-white/10 hover:border-secondary/30 transition-all">
+                    <div className="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Shield className="w-6 h-6 text-secondary" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-white text-sm sm:text-base">100% Transparent</p>
-                      <p className="text-gray-500 text-xs sm:text-sm">Open books</p>
-                    </div>
+                    <p className="font-semibold text-white mb-1">100% Transparent</p>
+                    <p className="text-gray-500 text-sm">Open books policy</p>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Award className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                  <div className="group p-4 bg-white/5 rounded-xl border border-white/10 hover:border-secondary/30 transition-all">
+                    <div className="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Award className="w-6 h-6 text-secondary" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-white text-sm sm:text-base">80G Certified</p>
-                      <p className="text-gray-500 text-xs sm:text-sm">Tax benefits</p>
-                    </div>
+                    <p className="font-semibold text-white mb-1">80G Certified</p>
+                    <p className="text-gray-500 text-sm">Tax benefits</p>
                   </div>
-                </div>
-              </div>
-            </FadeInSection>
-            <FadeInSection delay={200}>
-              <div className="relative mt-8 md:mt-0">
-                <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=500&fit=crop" alt="Volunteers" className="rounded-2xl w-full" />
-                <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-secondary text-black p-4 sm:p-6 rounded-xl">
-                  <p className="text-2xl sm:text-3xl font-bold">14+</p>
-                  <p className="text-xs sm:text-sm">Years of Impact</p>
                 </div>
               </div>
             </FadeInSection>
@@ -204,108 +254,63 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Impact Numbers */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Impact Stats */}
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Our Impact</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Changing Lives, One at a Time</h2>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <TrendingUp className="w-4 h-4" />
+                Our Impact
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">Changing Lives Together</h2>
             </div>
           </FadeInSection>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {impactStats.map((stat, i) => (
               <FadeInSection key={i} delay={i * 100}>
-                <div className="text-center p-4 sm:p-6 md:p-8 border border-gray-800 rounded-2xl bg-gray-900/50 hover:border-secondary/50 transition-colors">
+                <div className="text-center p-8 bg-gradient-to-br from-white/5 to-transparent rounded-2xl border border-white/10 hover:border-secondary/30 transition-all duration-500 group hover:-translate-y-2">
                   <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                  <p className="text-gray-400 mt-2 text-sm sm:text-base">{stat.label}</p>
+                  <p className="text-gray-400 mt-3 text-lg">{stat.label}</p>
                 </div>
               </FadeInSection>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Why Trust Us</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">The Hope Difference</h2>
-            </div>
-          </FadeInSection>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { icon: Shield, title: '100% Transparent', desc: 'Every rupee tracked & reported' },
-              { icon: Award, title: '80G Tax Benefit', desc: '50% deduction on donations' },
-              { icon: CheckCircle, title: 'Direct Impact', desc: 'Funds reach beneficiaries directly' },
-              { icon: Users, title: '10,000+ Trust', desc: 'Donors believe in our mission' }
-            ].map((item, i) => (
-              <FadeInSection key={i} delay={i * 100}>
-                <div className="text-center p-4 sm:p-6 md:p-8 border border-gray-800 rounded-2xl hover:border-secondary/50 transition-all bg-gray-900/30">
-                  <item.icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-secondary mx-auto mb-3 sm:mb-4" />
-                  <h3 className="font-bold text-white text-sm sm:text-base md:text-lg mb-1 sm:mb-2">{item.title}</h3>
-                  <p className="text-gray-500 text-xs sm:text-sm">{item.desc}</p>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-            <FadeInSection>
-              <div className="bg-gradient-to-br from-gray-900 to-black text-white rounded-2xl p-6 sm:p-8 md:p-10 border border-gray-800 h-full">
-                <Eye className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-secondary mb-4 sm:mb-6" />
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold mb-3 sm:mb-4">Our Vision</h3>
-                <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                  A world where every individual has equal access to quality education, healthcare, and opportunities for growth and development.
-                </p>
-              </div>
-            </FadeInSection>
-            <FadeInSection delay={200}>
-              <div className="bg-gradient-to-br from-secondary to-yellow-600 text-black rounded-2xl p-6 sm:p-8 md:p-10 h-full">
-                <Target className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 mb-4 sm:mb-6" />
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold mb-3 sm:mb-4">Our Mission</h3>
-                <p className="text-black/80 leading-relaxed text-sm sm:text-base">
-                  To empower underprivileged communities through education, healthcare, and sustainability programs that create lasting positive change.
-                </p>
-              </div>
-            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* Programs */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-black to-gray-950 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Our Work</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-4">Our Programs</h2>
-              <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">Four key areas creating meaningful, lasting impact in communities across India.</p>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Heart className="w-4 h-4" />
+                Our Programs
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4">Four Pillars of Change</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">Four key areas creating meaningful, lasting impact in communities across India.</p>
             </div>
           </FadeInSection>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {programs.map((program, i) => {
               const Icon = programIcons[program.category] || Heart
               const colorClass = programColors[program.category] || 'from-gray-500 to-gray-600'
               return (
                 <FadeInSection key={program._id} delay={i * 100}>
-                  <Link to={`/programs/${program.slug || program.title.toLowerCase().replace(/ /g, '-')}`} className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-secondary/50 transition-all group">
-                    <div className={`h-32 sm:h-40 bg-gradient-to-br ${colorClass} flex items-center justify-center`}>
-                      <Icon className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-white/90 group-hover:scale-110 transition-transform duration-500" />
+                  <Link to={`/programs/${program.slug || program.title.toLowerCase().replace(/ /g, '-')}`} className="group block bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2 shadow-xl">
+                    <div className={`h-40 md:h-48 bg-gradient-to-br ${colorClass} flex items-center justify-center relative overflow-hidden`}>
+                      <Icon className="w-20 h-20 text-white/90 group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                     </div>
-                    <div className="p-4 sm:p-6">
-                      <span className="inline-block px-2 sm:px-3 py-1 bg-secondary/20 text-secondary text-xs rounded-full font-semibold mb-2 sm:mb-3">{program.category}</span>
-                      <h3 className="font-bold text-white text-sm sm:text-lg mb-1 sm:mb-2 group-hover:text-secondary transition-colors">{program.title}</h3>
-                      <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 mb-3 sm:mb-4">{program.description}</p>
-                      <span className="text-secondary text-xs sm:text-sm font-semibold flex items-center">
-                        Learn More <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+                    <div className="p-6">
+                      <span className="inline-block px-3 py-1 bg-secondary/20 text-secondary text-xs rounded-full font-bold mb-3">{program.category}</span>
+                      <h3 className="font-bold text-xl text-white mb-2 group-hover:text-secondary transition-colors">{program.title}</h3>
+                      <p className="text-gray-500 text-sm line-clamp-2 mb-4">{program.description}</p>
+                      <span className="inline-flex items-center gap-1 text-secondary font-semibold text-sm group-hover:gap-2 transition-all">
+                        Learn More <ArrowRight className="w-4 h-4" />
                       </span>
                     </div>
                   </Link>
@@ -316,139 +321,163 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Fund Allocation */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-16 items-center">
+      {/* Mission & Vision */}
+      <section className="py-20 md:py-32 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             <FadeInSection>
-              <div>
-                <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Your Impact</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-4 sm:mb-6">Where Your Money Goes</h2>
-                <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base">We believe in complete transparency. See exactly how your donation is making a difference.</p>
-                <div className="space-y-3 sm:space-y-4">
-                  {[
-                    { percent: 50, label: 'Education', color: 'bg-blue-500', amount: '₹6.25L' },
-                    { percent: 30, label: 'Healthcare', color: 'bg-red-500', amount: '₹3.75L' },
-                    { percent: 15, label: 'Women Empowerment', color: 'bg-purple-500', amount: '₹1.88L' },
-                    { percent: 5, label: 'Operations', color: 'bg-gray-500', amount: '₹0.62L' }
-                  ].map((item, i) => (
-                    <div key={i} className="bg-gray-900 rounded-xl p-3 sm:p-4 border border-gray-800">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <span className="font-semibold text-white text-sm sm:text-base">{item.label}</span>
-                        <span className="text-secondary font-bold text-sm sm:text-base">{item.percent}% • {item.amount}</span>
-                      </div>
-                      <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div className={`h-full ${item.color} rounded-full transition-all duration-1000`} style={{ width: `${item.percent}%` }}></div>
-                      </div>
-                    </div>
-                  ))}
+              <div className="group h-full bg-gradient-to-br from-gray-900 via-gray-900 to-black p-8 md:p-10 rounded-3xl border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
+                  <Eye className="w-8 h-8 text-secondary" />
                 </div>
-                <Link to="/transparency" className="inline-flex items-center gap-2 mt-6 sm:mt-8 text-secondary font-semibold hover:underline text-sm sm:text-base">
-                  View Full Report <ArrowRight className="w-4 h-4" />
-                </Link>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">Our Vision</h3>
+                <p className="text-gray-400 leading-relaxed text-lg">
+                  A world where every individual has equal access to quality education, healthcare, and opportunities for growth and development.
+                </p>
               </div>
             </FadeInSection>
             <FadeInSection delay={200}>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-8 lg:mt-0">
-                {[
-                  { value: '₹12.5Cr+', label: 'Total Funds Raised' },
-                  { value: '100%', label: 'Fund Utilization' },
-                  { value: '4', label: 'Active Programs' },
-                  { value: '50+', label: 'Communities Served' }
-                ].map((stat, i) => (
-                  <div key={i} className="bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-800 text-center">
-                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-1 sm:mb-2">{stat.value}</p>
-                    <p className="text-gray-500 text-xs sm:text-sm">{stat.label}</p>
-                  </div>
-                ))}
+              <div className="group h-full bg-gradient-to-br from-secondary to-yellow-600 p-8 md:p-10 rounded-3xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all duration-500 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-black/20 rounded-2xl flex items-center justify-center mb-6">
+                  <Target className="w-8 h-8 text-black" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">Our Mission</h3>
+                <p className="text-black/80 leading-relaxed text-lg">
+                  To empower underprivileged communities through education, healthcare, and sustainability programs that create lasting positive change.
+                </p>
               </div>
             </FadeInSection>
           </div>
         </div>
       </section>
 
-      {/* Video Section */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <FadeInSection>
-            <div className="text-center mb-8 sm:mb-12">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Our Story</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">See the Difference We Make</h2>
-            </div>
-          </FadeInSection>
-          <FadeInSection delay={200}>
-            <div className="relative rounded-2xl overflow-hidden border border-gray-800">
-              <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=1200&h=600&fit=crop" alt="Our Work" className="w-full h-48 sm:h-64 md:h-96 object-cover" />
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <button className="w-16 h-16 sm:w-20 sm:h-20 bg-secondary rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 text-black" />
-                </button>
-              </div>
-            </div>
-          </FadeInSection>
-        </div>
-      </section>
-
       {/* Testimonials */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Testimonials</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">What Supporters Say</h2>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Star className="w-4 h-4" />
+                Testimonials
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">What People Say</h2>
             </div>
           </FadeInSection>
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {testimonials.map((t, i) => (
               <FadeInSection key={i} delay={i * 100}>
-                <div className="bg-gray-900 rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-800 h-full relative">
-                  <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-secondary/20 absolute top-4 sm:top-6 right-4 sm:right-6" />
-                  <div className="flex mb-3 sm:mb-4">
-                    {[...Array(t.rating)].map((_, j) => <Star key={j} className="w-3 h-3 sm:w-4 sm:h-4 text-secondary fill-secondary" />)}
+                <div className="relative p-8 bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-white/10 hover:border-secondary/30 transition-all duration-500 group">
+                  <Quote className="w-12 h-12 text-secondary/20 absolute top-6 right-6" />
+                  <div className="flex mb-4">
+                    {[...Array(t.rating)].map((_, j) => <Star key={j} className="w-5 h-5 text-secondary fill-secondary" />)}
                   </div>
-                  <p className="text-gray-400 leading-relaxed italic mb-4 sm:mb-6 text-sm sm:text-base">"{t.text}"</p>
-                  <div className="flex items-center">
-                    <img src={t.image} alt={t.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4 border-2 border-secondary" />
+                  <p className="text-gray-300 leading-relaxed italic mb-6 text-lg">"{t.text}"</p>
+                  <div className="flex items-center gap-4">
+                    <img src={t.image} alt={t.name} className="w-14 h-14 rounded-full border-2 border-secondary p-0.5" />
                     <div>
-                      <p className="font-bold text-white text-sm sm:text-base">{t.name}</p>
-                      <p className="text-gray-500 text-xs sm:text-sm">{t.role}</p>
+                      <p className="font-bold text-white">{t.name}</p>
+                      <p className="text-secondary text-sm">{t.role}</p>
                     </div>
                   </div>
                 </div>
               </FadeInSection>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video/Impact Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-b from-black to-gray-950 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <FadeInSection>
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-6">
+                  <Video className="w-4 h-4" />
+                  Our Story
+                </span>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
+                  See the <span className="text-gradient">Change</span> We Create
+                </h2>
+                <p className="text-gray-400 leading-relaxed mb-8 text-lg">
+                  Watch how Hope Foundation transforms communities across India. From building schools in remote villages to providing healthcare to those who need it most, every moment captured tells a story of hope and resilience.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                    <p className="text-2xl font-bold text-secondary mb-1">500+</p>
+                    <p className="text-gray-400 text-sm">Schools Built</p>
+                  </div>
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                    <p className="text-2xl font-bold text-secondary mb-1">100K+</p>
+                    <p className="text-gray-400 text-sm">Lives Transformed</p>
+                  </div>
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={200}>
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-secondary/20 to-yellow-500/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="relative aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden border border-white/10 cursor-pointer group">
+                  <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=450&fit=crop" alt="Impact Video" className="w-full h-full object-cover opacity-60" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center shadow-lg shadow-secondary/30 group-hover:scale-110 transition-transform">
+                      <PlayCircle className="w-10 h-10 text-black fill-black ml-1" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="text-white font-semibold text-lg">Watch Our Impact Video</p>
+                    <p className="text-gray-300 text-sm">3:45 • 50K views</p>
+                  </div>
+                </div>
+              </div>
+            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* Events Section */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">Upcoming Events</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Join Our Events</h2>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Calendar className="w-4 h-4" />
+                Upcoming Events
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4">Join Our Mission</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">Participate in our upcoming events and be part of something meaningful.</p>
             </div>
           </FadeInSection>
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {[
-              { title: 'Annual Charity Gala', date: 'March 25, 2026', location: 'Mumbai', image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400&h=300&fit=crop' },
-              { title: 'Education Drive', date: 'April 10, 2026', location: 'Pune', image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=300&fit=crop' },
-              { title: 'Health Camp', date: 'April 20, 2026', location: 'Ahmedabad', image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop' }
+              { title: 'Annual Charity Gala', date: 'March 25, 2026', location: 'Mumbai, India', image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=400&h=300&fit=crop', raised: 2500000, goal: 5000000 },
+              { title: 'Education Drive', date: 'April 10, 2026', location: 'Delhi NCR', image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=300&fit=crop', raised: 1800000, goal: 3000000 },
+              { title: 'Health Camp', date: 'April 22, 2026', location: 'Rural Rajasthan', image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=300&fit=crop', raised: 900000, goal: 2000000 }
             ].map((event, i) => (
               <FadeInSection key={i} delay={i * 100}>
-                <div className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 group hover:border-secondary/50 transition-all">
-                  <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
-                    <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-secondary text-black px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
-                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" /> {event.date}
+                <div className="group bg-gradient-to-br from-gray-900 to-black rounded-2xl overflow-hidden border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+                  <div className="relative h-48 overflow-hidden">
+                    <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    <div className="absolute top-4 left-4 px-3 py-1 bg-secondary text-black text-xs font-bold rounded-full">
+                      UPCOMING
                     </div>
                   </div>
-                  <div className="p-4 sm:p-6">
-                    <h3 className="font-bold text-white text-sm sm:text-lg mb-1 sm:mb-2">{event.title}</h3>
-                    <p className="text-gray-500 flex items-center text-xs sm:text-sm">
-                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> {event.location}
-                    </p>
+                  <div className="p-6">
+                    <h3 className="font-bold text-xl text-white mb-3 group-hover:text-secondary transition-colors">{event.title}</h3>
+                    <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
+                      <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {event.date}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {event.location}</span>
+                    </div>
+                    <div className="w-full bg-gray-800 rounded-full h-2 mb-2">
+                      <div className="bg-gradient-to-r from-secondary to-yellow-500 h-2 rounded-full" style={{ width: `${(event.raised / event.goal) * 100}%` }} />
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary font-semibold">₹{(event.raised / 100000).toFixed(1)}L raised</span>
+                      <span className="text-gray-500">Goal: ₹{(event.goal / 100000).toFixed(1)}L</span>
+                    </div>
                   </div>
                 </div>
               </FadeInSection>
@@ -457,60 +486,72 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Quick Donate */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      {/* Quick Donate Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInSection>
-            <div className="bg-gray-900 rounded-3xl border border-gray-800 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-900 to-black p-6 sm:p-8 md:p-10 text-center border-b border-gray-800">
-                <Heart className="w-10 h-10 sm:w-12 sm:h-12 text-secondary mx-auto mb-4" />
-                <h3 className="text-xl sm:text-2xl font-heading font-bold text-white">Make a Difference Today</h3>
-                <p className="text-gray-500 mt-2 text-sm sm:text-base">Select an amount to donate</p>
+            <div className="text-center mb-12">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Heart className="w-4 h-4" />
+                Quick Donate
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4">Make an Instant Impact</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">Choose an amount that works for you. Every rupee counts.</p>
+            </div>
+          </FadeInSection>
+          <FadeInSection delay={100}>
+            <div className="bg-gradient-to-br from-gray-900 to-black p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[500, 1000, 2500, 5000].map((amount) => (
+                  <button key={amount} className="group relative p-4 bg-white/5 rounded-xl border border-white/20 hover:border-secondary/50 hover:bg-secondary/10 transition-all duration-300">
+                    <span className="text-2xl font-bold text-white">₹{amount}</span>
+                    <span className="block text-xs text-gray-400 mt-1">Impact amount</span>
+                  </button>
+                ))}
               </div>
-              <div className="p-4 sm:p-6 md:p-10">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                  {[500, 1000, 2500, 5000].map((amount) => (
-                    <Link key={amount} to={`/donate?amount=${amount}`} className="py-3 sm:py-4 px-4 sm:px-6 border-2 border-secondary text-secondary rounded-xl font-bold text-center hover:bg-secondary hover:text-black transition-all text-sm sm:text-base">
-                      ₹{amount}
-                    </Link>
-                  ))}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">₹</span>
+                  <input type="number" placeholder="Custom amount" className="w-full pl-10 pr-4 py-4 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:border-secondary focus:outline-none transition-colors" />
                 </div>
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6 bg-black rounded-xl border border-gray-800">
-                  <p className="text-gray-400 text-sm sm:text-base">Or enter a custom amount</p>
-                  <Link to="/donate" className="px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all text-sm sm:text-base">
+                <Link to="/donate" className="group relative px-8 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold text-lg rounded-xl overflow-hidden shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-1">
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <span className="relative flex items-center gap-3">
+                    <Heart className="w-5 h-5" />
                     Donate Now
-                  </Link>
-                </div>
-                <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-gray-500 text-xs sm:text-sm">
-                  <span className="flex items-center"><Shield className="w-4 h-4 mr-2 text-green-500" />Secure Payment</span>
-                  <span className="flex items-center"><Award className="w-4 h-4 mr-2 text-secondary" />80G Benefit</span>
-                  <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-secondary" />Instant Receipt</span>
-                </div>
+                  </span>
+                </Link>
               </div>
+              <p className="text-gray-500 text-sm text-center mt-6">100% tax deductible under Section 80G • Instant 80G certificate</p>
             </div>
           </FadeInSection>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      {/* FAQ Section */}
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInSection>
-            <div className="text-center mb-10 sm:mb-16">
-              <p className="text-secondary font-medium tracking-wider uppercase text-sm mb-4">FAQs</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Frequently Asked Questions</h2>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Shield className="w-4 h-4" />
+                FAQs
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4">Common Questions</h2>
+              <p className="text-gray-400 max-w-2xl mx-auto text-lg">Everything you need to know about donating and our work.</p>
             </div>
           </FadeInSection>
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-4">
             {faqs.map((faq, i) => (
-              <FadeInSection key={i} delay={i * 50}>
-                <details className="bg-gray-900 rounded-xl border border-gray-800 group">
-                  <summary className="p-4 sm:p-6 cursor-pointer flex items-center justify-between font-bold text-white hover:text-secondary transition-colors text-sm sm:text-base">
-                    {faq.q}
-                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0 group-open:rotate-90 transition-transform" />
+              <FadeInSection key={i} delay={i * 100}>
+                <details className="group bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-white/10 overflow-hidden">
+                  <summary className="flex items-center justify-between p-6 cursor-pointer list-none hover:bg-white/5 transition-colors">
+                    <span className="font-semibold text-lg text-white pr-4">{faq.q}</span>
+                    <ChevronRight className="w-5 h-5 text-secondary flex-shrink-0 group-open:rotate-90 transition-transform" />
                   </summary>
-                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 text-gray-400 leading-relaxed border-t border-gray-800 pt-3 sm:pt-4 text-sm sm:text-base">
-                    {faq.a}
+                  <div className="px-6 pb-6">
+                    <p className="text-gray-400 leading-relaxed">{faq.a}</p>
                   </div>
                 </details>
               </FadeInSection>
@@ -519,35 +560,57 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-16 sm:py-20 md:py-32 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      {/* Newsletter Section */}
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInSection>
-            <Mail className="w-12 h-12 sm:w-16 sm:h-16 text-secondary mx-auto mb-4 sm:mb-6" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white mb-3 sm:mb-4">Stay Updated</h2>
-            <p className="text-gray-400 mb-6 sm:mb-8 max-w-xl mx-auto text-sm sm:text-base">Subscribe to receive latest updates on our programs and impact stories.</p>
-            <form className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-lg mx-auto">
-              <input type="email" placeholder="Enter your email" className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-gray-900 border border-gray-800 rounded-xl text-white focus:border-secondary focus:outline-none text-sm sm:text-base" />
-              <button type="submit" className="px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
-                <Send className="w-4 h-4" /> Subscribe
-              </button>
-            </form>
+            <div className="text-center p-12 bg-gradient-to-br from-gray-900 via-gray-900 to-black rounded-3xl border border-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-grid opacity-20" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-3xl" />
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/20 rounded-full mb-6">
+                  <Mail className="w-8 h-8 text-secondary" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">Stay Connected</h2>
+                <p className="text-gray-400 max-w-xl mx-auto mb-8 text-lg">Get updates on our impact, stories of change, and ways to get involved. No spam, we promise.</p>
+                <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
+                  <div className="flex-1 relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <input type="email" placeholder="Enter your email" className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/20 rounded-xl text-white placeholder-gray-500 focus:border-secondary focus:outline-none transition-colors" />
+                  </div>
+                  <button type="submit" className="px-8 py-4 bg-secondary hover:bg-yellow-400 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <Send className="w-5 h-5" />
+                    Subscribe
+                  </button>
+                </form>
+                <p className="text-gray-600 text-sm mt-6">Join 10,000+ supporters receiving our newsletter</p>
+              </div>
+            </div>
           </FadeInSection>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 sm:py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      {/* CTA Section */}
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-secondary/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <FadeInSection>
-            <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-secondary mx-auto mb-4 sm:mb-6" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-white mb-3 sm:mb-4">Ready to Make a Difference?</h2>
-            <p className="text-gray-400 mb-8 sm:mb-10 max-w-2xl mx-auto text-sm sm:text-base md:text-lg">Join us in our mission to transform lives and build a better tomorrow.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-              <Link to="/donate" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
-                <Heart className="w-5 h-5" /> Donate Now
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-secondary/20 rounded-full mb-8">
+              <Heart className="w-10 h-10 text-secondary" />
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">Ready to Make a Difference?</h2>
+            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">Join us in our mission to transform lives and build a better tomorrow. Every contribution counts.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/donate" className="group relative w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold text-lg rounded-xl overflow-hidden shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition-all duration-300 hover:-translate-y-1">
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative flex items-center justify-center gap-3">
+                  <Heart className="w-5 h-5" />
+                  Donate Now
+                </span>
               </Link>
-              <Link to="/contact" className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-700 text-white font-semibold rounded-xl hover:border-secondary hover:text-secondary transition-all text-sm sm:text-base">
+              <Link to="/contact" className="w-full sm:w-auto px-10 py-4 bg-white/5 backdrop-blur-xl border border-white/20 text-white font-semibold text-lg rounded-xl hover:bg-white/10 hover:border-secondary/50 transition-all duration-300">
                 Contact Us
               </Link>
             </div>

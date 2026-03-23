@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Heart, CreditCard, Smartphone, Building2, Check, Shield, Award, Loader2, Receipt, FileText } from 'lucide-react'
 import axios from 'axios'
@@ -14,6 +14,8 @@ const Donate = () => {
   const [paymentMethod, setPaymentMethod] = useState('UPI')
   const [recurring, setRecurring] = useState(false)
   const [donationResult, setDonationResult] = useState(null)
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false)
+  const razorpayRef = useRef(null)
 
   const amounts = [500, 1000, 2500, 5000, 10000]
   const paymentMethods = [
@@ -29,19 +31,39 @@ const Donate = () => {
     if (amount) setSelectedAmount(parseInt(amount))
     const program = searchParams.get('program')
     if (program) setFormData(prev => ({ ...prev, program }))
+
+    const loadRazorpay = () => {
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.async = true
+      script.onload = () => setRazorpayLoaded(true)
+      script.onerror = () => {
+        toast.error('Failed to load payment gateway')
+        setRazorpayLoaded(false)
+      }
+      document.body.appendChild(script)
+    }
+    loadRazorpay()
+
+    return () => {
+      if (document.querySelector('script[src*="razorpay"]')) {
+        document.querySelector('script[src*="razorpay"]')?.remove()
+      }
+    }
   }, [searchParams])
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!formData.donorName || !formData.email) { toast.error('Please fill required fields'); return }
+    if (finalAmount < 100) { toast.error('Minimum donation is ₹100'); return }
     setStep(2)
   }
 
   const handlePayment = async () => {
     setLoading(true)
     let donationId = ''
-    const receiptNum = `HF${Date.now().toString().slice(-8)}`
-    const certId = `CERT${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+    let receiptNum = `HF${Date.now().toString().slice(-8)}`
+    let certId = `CERT${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`
     
     try {
       const response = await axios.post('/api/donations', {
@@ -57,31 +79,141 @@ const Donate = () => {
       donationId = response.data.donation.id
     } catch { donationId = 'DEMO-' + Date.now() }
 
+    try {
+      if (razorpayLoaded && window.Razorpay) {
+        const keyResponse = await axios.get('/api/payment/key')
+        const orderResponse = await axios.post('/api/payment/create-order', {
+          amount: finalAmount,
+          currency: 'INR',
+          receipt: donationId
+        })
+
+        const options = {
+          key: keyResponse.data.key,
+          amount: orderResponse.data.amount,
+          currency: orderResponse.data.currency,
+          name: 'Hope Foundation',
+          description: `Donation for ${formData.program}`,
+          image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=100&h=100',
+          order_id: orderResponse.data.orderId,
+          handler: async (response) => {
+            try {
+              await axios.post('/api/donations/verify-payment', {
+                donationId,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+              })
+              
+              setLoading(false)
+              setDonationResult({ donationId, amount: finalAmount, receiptNumber: receiptNum, certificateId: certId })
+              setStep(3)
+              
+              setTimeout(async () => {
+                try {
+                  await axios.post('/api/certificates/generate', { donationId, type: 'donation' })
+                  await axios.post('/api/certificates/generate', { donationId, type: '80g' })
+                  await axios.post('/api/certificates/receipt/generate', { donationId })
+                  toast.success('All certificates auto-generated!')
+                } catch { toast.success('Certificates in dashboard.') }
+              }, 500)
+              toast.success('Payment successful!')
+            } catch (error) {
+              toast.error('Payment verification failed')
+            }
+          },
+          prefill: {
+            name: formData.donorName,
+            email: formData.email,
+            contact: formData.phone || ''
+          },
+          notes: {
+            donationId: donationId,
+            program: formData.program
+          },
+          theme: {
+            color: '#F59E0B'
+          },
+          modal: {
+            ondismiss: () => {
+              setLoading(false)
+              toast.error('Payment cancelled')
+            }
+          }
+        }
+
+        razorpayRef.current = new window.Razorpay(options)
+        razorpayRef.current.open()
+      } else {
+        await processDemoPayment(donationId, receiptNum, certId)
+      }
+    } catch (error) {
+      console.error('Payment error:', error)
+      await processDemoPayment(donationId, receiptNum, certId)
+    }
+  }
+
+  const processDemoPayment = async (donationId, receiptNum, certId) => {
+    setLoading(false)
+    setDonationResult({ donationId, amount: finalAmount, receiptNumber: receiptNum, certificateId: certId })
+    setStep(3)
+    
     setTimeout(async () => {
-      try { await axios.post('/api/donations/verify-payment', { donationId, razorpayPaymentId: 'DEMO_' + Date.now() }) } catch {}
-      setLoading(false)
-      setDonationResult({ donationId, amount: finalAmount, receiptNumber: receiptNum, certificateId: certId })
-      setStep(3)
-      setTimeout(async () => {
-        try {
-          await axios.post('/api/certificates/generate', { donationId, type: 'donation' })
-          await axios.post('/api/certificates/generate', { donationId, type: '80g' })
-          await axios.post('/api/certificates/receipt/generate', { donationId })
-          toast.success('All certificates auto-generated!')
-        } catch { toast.success('Certificates in dashboard.') }
-      }, 500)
-      toast.success('Payment successful!')
-    }, 1500)
+      try {
+        await axios.post('/api/donations/verify-payment', { donationId, razorpayPaymentId: 'DEMO_' + Date.now() })
+        await axios.post('/api/certificates/generate', { donationId, type: 'donation' })
+        await axios.post('/api/certificates/generate', { donationId, type: '80g' })
+        await axios.post('/api/certificates/receipt/generate', { donationId })
+        toast.success('All certificates auto-generated!')
+      } catch { toast.success('Certificates in dashboard.') }
+    }, 500)
+    toast.success('Payment successful (Demo Mode)!')
   }
 
   const downloadReceipt = async () => {
-    try { await axios.post('/api/certificates/receipt/generate', { donationId: donationResult?.donationId }); toast.success('Receipt generated!') } 
-    catch { toast.error('Generating...') }
+    try {
+      toast.loading('Generating receipt...')
+      const res = await axios.post('/api/certificates/receipt/generate', { donationId: donationResult?.donationId })
+      toast.dismiss()
+      const downloadUrl = res.data.receipt?.downloadUrl
+      if (downloadUrl) {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.setAttribute('download', '')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        toast.success('Receipt downloaded!')
+      } else {
+        toast.success('Receipt generated! Check dashboard.')
+      }
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Failed to generate receipt')
+    }
   }
 
   const downloadCertificate = async (type) => {
-    try { await axios.post('/api/certificates/generate', { donationId: donationResult?.donationId, type }); toast.success('Generated!') } 
-    catch { toast.error('Generating...') }
+    try {
+      toast.loading('Generating certificate...')
+      const res = await axios.post('/api/certificates/generate', { donationId: donationResult?.donationId, type })
+      toast.dismiss()
+      const downloadUrl = res.data.certificate?.downloadUrl
+      if (downloadUrl) {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.setAttribute('download', '')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        toast.success('Certificate downloaded!')
+      } else {
+        toast.success('Certificate generated! Check dashboard.')
+      }
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Failed to generate certificate')
+    }
   }
 
   const numberToWords = (num) => {
@@ -145,6 +277,7 @@ const Donate = () => {
                     <input type="number" value={customAmount} onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(0) }}
                       placeholder="Enter amount" className="w-full pl-10 pr-4 py-4 border-2 border-gray-700 rounded-xl focus:border-secondary focus:outline-none text-lg font-display bg-gray-800 text-white" />
                   </div>
+                  <p className="text-xs text-gray-500 mt-2">Minimum donation: ₹100</p>
                 </div>
 
                 <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 mb-6 sm:mb-8 border border-gray-700">

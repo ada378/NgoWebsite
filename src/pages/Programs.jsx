@@ -1,7 +1,31 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import { GraduationCap, Activity, Users, TreePine, ArrowRight } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { GraduationCap, Activity, Users, TreePine, ArrowRight, Heart, TrendingUp } from 'lucide-react'
 import axios from 'axios'
+
+const FadeInSection = ({ children, delay = 0, className = '' }) => {
+  const ref = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true) },
+      { threshold: 0.1 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
 
 const Programs = () => {
   const [programs, setPrograms] = useState([])
@@ -30,129 +54,154 @@ const Programs = () => {
 
   const categories = ['All', 'Education', 'Healthcare', 'Women Empowerment', 'Environment']
   const icons = { 'Education': GraduationCap, 'Healthcare': Activity, 'Women Empowerment': Users, 'Environment': TreePine }
-  const colors = { 'Education': 'from-blue-500 to-blue-600', 'Healthcare': 'from-red-500 to-red-600', 'Women Empowerment': 'from-purple-500 to-purple-600', 'Environment': 'from-green-500 to-green-600' }
+  const colors = { 'Education': 'from-blue-600 to-blue-700', 'Healthcare': 'from-red-600 to-red-700', 'Women Empowerment': 'from-purple-600 to-purple-700', 'Environment': 'from-emerald-600 to-emerald-700' }
+  const barColors = { 'Education': 'bg-blue-500', 'Healthcare': 'bg-red-500', 'Women Empowerment': 'bg-purple-500', 'Environment': 'bg-emerald-500' }
 
   const filteredPrograms = filter === 'All' ? programs : programs.filter(p => p.category === filter)
   const totalStats = programs.reduce((acc, p) => ({ lives: acc.lives + p.impactStats.livesImpacted, projects: acc.projects + p.impactStats.projectsCompleted, volunteers: acc.volunteers + p.impactStats.volunteers }), { lives: 0, projects: 0, volunteers: 0 })
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative bg-black text-white pt-24 pb-16 sm:pt-32 sm:pb-20">
+    <div className="min-h-screen overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1920&h=600&fit=crop" alt="Programs" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Our Programs</p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 sm:mb-6">Our Programs</h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4">
-            We work across four key areas to create meaningful, lasting impact in communities across India.
-          </p>
+        
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 text-center">
+          <FadeInSection>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 mb-6">
+              <Heart className="w-4 h-4 text-secondary" />
+              <span className="text-secondary font-medium text-sm">Four Pillars of Change</span>
+            </div>
+            
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 leading-tight">
+              Our <span className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">Programs</span>
+            </h1>
+            
+            <p className="text-gray-400 text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed px-4">
+              We work across four key areas to create meaningful, lasting impact in communities across India.
+            </p>
+          </FadeInSection>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="py-10 sm:py-16 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 text-center">
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {[
-              { label: 'Lives Impacted', value: totalStats.lives.toLocaleString() + '+' },
-              { label: 'Projects', value: totalStats.projects + '+' },
-              { label: 'Volunteers', value: totalStats.volunteers.toLocaleString() + '+' },
-              { label: 'Communities', value: '50+' }
+              { label: 'Lives Impacted', value: totalStats.lives.toLocaleString() + '+', icon: Heart },
+              { label: 'Projects', value: totalStats.projects + '+', icon: TrendingUp },
+              { label: 'Volunteers', value: totalStats.volunteers.toLocaleString() + '+', icon: Users },
+              { label: 'Communities', value: '50+', icon: Globe }
             ].map((stat, i) => (
-              <div key={i} className="bg-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-800">
-                <p className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-secondary mb-1">{stat.value}</p>
-                <p className="text-gray-500 text-xs sm:text-sm">{stat.label}</p>
-              </div>
+              <FadeInSection key={i} delay={i * 100}>
+                <div className="text-center p-8 bg-gradient-to-br from-white/5 to-transparent rounded-2xl border border-white/10 hover:border-secondary/30 transition-all duration-500 group hover:-translate-y-2">
+                  <stat.icon className="w-8 h-8 text-secondary mx-auto mb-4" />
+                  <p className="text-3xl md:text-4xl font-display font-bold text-gradient mb-2">{stat.value}</p>
+                  <p className="text-gray-400">{stat.label}</p>
+                </div>
+              </FadeInSection>
             ))}
           </div>
         </div>
       </section>
 
       {/* Programs */}
-      <section className="py-10 sm:py-12 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           {/* Filter */}
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setFilter(category)}
-                className={`px-3 sm:px-5 sm:py-2.5 py-2 rounded-full font-medium transition-all text-xs sm:text-sm ${
-                  filter === category
-                    ? 'bg-secondary text-black'
-                    : 'bg-gray-900 text-gray-300 hover:bg-gray-800 border border-gray-800'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          <FadeInSection>
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setFilter(category)}
+                  className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                    filter === category
+                      ? 'bg-gradient-to-r from-secondary to-yellow-500 text-black shadow-lg shadow-secondary/30'
+                      : 'bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10 hover:border-secondary/50'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </FadeInSection>
 
           {/* Grid */}
-          <div className="grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
-            {filteredPrograms.map((program) => {
+          <div className="grid md:grid-cols-2 gap-8 md:gap-10">
+            {filteredPrograms.map((program, index) => {
               const Icon = icons[program.category] || GraduationCap
               const color = colors[program.category] || 'from-gray-500 to-gray-600'
+              const barColor = barColors[program.category] || 'bg-gray-500'
               const progress = program.goals?.raised && program.goals?.target ? Math.round((program.goals.raised / program.goals.target) * 100) : 0
 
               return (
-                <Link
-                  key={program._id}
-                  to={`/programs/${program.slug}`}
-                  className="bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden border border-gray-800 hover:border-secondary/50 transition-all group"
-                >
-                  <div className={`h-36 sm:h-44 md:h-48 bg-gradient-to-br ${color} flex items-center justify-center relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                    <Icon className="w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 text-white relative z-10" />
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 px-2 sm:px-3 py-0.5 sm:py-1 bg-black/30 backdrop-blur rounded-full text-white text-xs sm:text-sm">
-                      {program.category}
-                    </div>
-                  </div>
-
-                  <div className="p-4 sm:p-6 md:p-8">
-                    <h3 className="font-heading font-bold text-lg sm:text-xl md:text-2xl mb-2 sm:mb-3 text-white group-hover:text-secondary transition-colors">
-                      {program.title}
-                    </h3>
-                    <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-3">{program.description}</p>
-
-                    <div className="grid grid-cols-3 gap-2 sm:gap-3 sm:gap-4 mb-4 sm:mb-6">
-                      {[
-                        { label: 'Lives', value: (program.impactStats.livesImpacted / 1000).toFixed(0) + 'K+' },
-                        { label: 'Projects', value: program.impactStats.projectsCompleted },
-                        { label: 'Volunteers', value: (program.impactStats.volunteers / 100).toFixed(0) + 'K+' }
-                      ].map((stat, i) => (
-                        <div key={i} className="text-center p-2 sm:p-3 bg-black rounded-lg border border-gray-800">
-                          <p className="font-display font-bold text-sm sm:text-base md:text-lg text-secondary">{stat.value}</p>
-                          <p className="text-gray-500 text-xs">{stat.label}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {program.goals?.target && (
-                      <div className="mb-4 sm:mb-6">
-                        <div className="flex justify-between text-xs sm:text-sm mb-1.5 sm:mb-2">
-                          <span className="font-medium text-gray-300">Funding Progress</span>
-                          <span className="text-secondary font-bold">{progress}%</span>
-                        </div>
-                        <div className="h-2 sm:h-3 bg-gray-800 rounded-full overflow-hidden">
-                          <div className={`h-full bg-gradient-to-r ${color} rounded-full transition-all`} style={{ width: `${progress}%` }}></div>
-                        </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-1 sm:mt-1.5">
-                          <span>₹{(program.goals.raised / 100000).toFixed(1)}L raised</span>
-                          <span>Goal: ₹{(program.goals.target / 100000).toFixed(1)}L</span>
-                        </div>
+                <FadeInSection key={program._id} delay={index * 100}>
+                  <Link
+                    to={`/programs/${program.slug}`}
+                    className="group block bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2 shadow-xl"
+                  >
+                    <div className={`h-48 md:h-56 bg-gradient-to-br ${color} flex items-center justify-center relative overflow-hidden`}>
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                      <Icon className="w-24 h-24 text-white/90 group-hover:scale-110 transition-transform duration-500" />
+                      <div className="absolute top-4 right-4 px-4 py-1.5 bg-black/30 backdrop-blur rounded-full text-white text-sm font-semibold">
+                        {program.category}
                       </div>
-                    )}
-
-                    <div className="flex items-center text-secondary font-medium text-sm sm:text-base">
-                      <span>Learn More & Donate</span>
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                     </div>
-                  </div>
-                </Link>
+
+                    <div className="p-8">
+                      <h3 className="font-bold text-2xl md:text-3xl mb-3 text-white group-hover:text-secondary transition-colors">
+                        {program.title}
+                      </h3>
+                      <p className="text-gray-400 mb-6 text-lg line-clamp-2">{program.description}</p>
+
+                      <div className="grid grid-cols-3 gap-4 mb-6">
+                        {[
+                          { label: 'Lives', value: (program.impactStats.livesImpacted / 1000).toFixed(0) + 'K+' },
+                          { label: 'Projects', value: program.impactStats.projectsCompleted },
+                          { label: 'Volunteers', value: (program.impactStats.volunteers / 100).toFixed(0) + 'K+' }
+                        ].map((stat, i) => (
+                          <div key={i} className="text-center p-4 bg-white/5 rounded-xl border border-white/10">
+                            <p className="font-display font-bold text-lg text-secondary">{stat.value}</p>
+                            <p className="text-gray-500 text-sm">{stat.label}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {program.goals?.target && (
+                        <div className="mb-6">
+                          <div className="flex justify-between mb-2">
+                            <span className="font-medium text-gray-300">Funding Progress</span>
+                            <span className="text-secondary font-bold">{progress}%</span>
+                          </div>
+                          <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${barColor} rounded-full transition-all`} style={{ width: `${progress}%` }}></div>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-500 mt-2">
+                            <span>₹{(program.goals.raised / 100000).toFixed(1)}L raised</span>
+                            <span>Goal: ₹{(program.goals.target / 100000).toFixed(1)}L</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center text-secondary font-semibold text-lg group-hover:gap-3 transition-all">
+                        <span>Learn More & Donate</span>
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </div>
+                    </div>
+                  </Link>
+                </FadeInSection>
               )
             })}
           </div>
@@ -160,18 +209,23 @@ const Programs = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-12 sm:py-20 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-6 text-white">
-            Want to Support a Specific Program?
-          </h2>
-          <p className="text-sm sm:text-base md:text-xl text-gray-400 mb-6 sm:mb-8">
-            You can choose to direct your donation to a specific program that resonates with you.
-          </p>
-          <Link to="/donate" className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all text-sm sm:text-base">
-            <span>Donate Now</span>
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-          </Link>
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-secondary/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <FadeInSection>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">Want to Support a Specific Program?</h2>
+            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">You can choose to direct your donation to a specific program that resonates with you.</p>
+            <Link to="/donate" className="group relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold text-lg rounded-xl overflow-hidden shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition-all duration-300 hover:-translate-y-1">
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <span className="relative flex items-center gap-3">
+                <Heart className="w-5 h-5" />
+                Donate Now
+              </span>
+              <ArrowRight className="w-5 h-5 relative" />
+            </Link>
+          </FadeInSection>
         </div>
       </section>
     </div>

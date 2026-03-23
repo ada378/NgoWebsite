@@ -1,5 +1,30 @@
 import { Link } from 'react-router-dom'
-import { Heart, Target, Eye, Users, Award, Building, Globe, Shield, CheckCircle, ArrowRight } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Heart, Target, Eye, Users, Award, Building, Globe, Shield, CheckCircle, ArrowRight, ChevronRight } from 'lucide-react'
+
+const FadeInSection = ({ children, delay = 0, className = '' }) => {
+  const ref = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true) },
+      { threshold: 0.1 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
 
 const About = () => {
   const team = [
@@ -25,178 +50,205 @@ const About = () => {
     { icon: Users, title: 'Inclusivity', description: 'We serve everyone regardless of background or circumstance.' }
   ]
 
+  const stats = [
+    { label: 'Lives Impacted', value: '50,000+' },
+    { label: 'Projects Completed', value: '160+' },
+    { label: 'Years of Service', value: '14+' },
+    { label: 'Communities Served', value: '50+' }
+  ]
+
   return (
-    <div>
+    <div className="min-h-screen overflow-hidden">
       {/* Hero Section */}
-      <section className="relative bg-black text-white pt-24 pb-16 sm:pt-32 sm:pb-20">
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop" alt="About" className="w-full h-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">About Us</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-4 sm:mb-6 leading-tight">
+        
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 text-center">
+          <FadeInSection>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 mb-6">
+              <Award className="w-4 h-4 text-secondary" />
+              <span className="text-secondary font-medium text-sm">Hope Foundation • Since 2010</span>
+            </div>
+            
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 leading-tight">
               Our Story of<br />
-              <span className="text-secondary">Hope & Impact</span>
+              <span className="bg-gradient-to-r from-secondary via-yellow-400 to-secondary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">Hope & Impact</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-400">
+            
+            <p className="text-gray-400 text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed px-4">
               For over 14 years, Hope Foundation has been dedicated to transforming lives through 
               education, healthcare, and sustainable community development.
             </p>
-          </div>
+          </FadeInSection>
         </div>
       </section>
 
       {/* Story Section */}
-      <section className="py-12 sm:py-20 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div>
-              <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Our Story</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-6 text-white">
-                Building a Better Tomorrow
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-4 sm:mb-6">
-                Hope Foundation was established in 2010 with a simple yet powerful vision: to create 
-                a world where every individual has access to opportunities for growth and development.
-              </p>
-              <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-4 sm:mb-6">
-                What started as a small initiative to provide education to underprivileged children 
-                in rural Maharashtra has grown into a comprehensive organization working across 
-                education, healthcare, women empowerment, and environmental conservation.
-              </p>
-              <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-6 sm:mb-8">
-                Today, we are proud to have impacted over 50,000 lives across 50+ communities, 
-                with a dedicated team of 2,000+ volunteers and partnerships with government agencies, 
-                corporations, and international organizations.
-              </p>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {[
-                  { label: 'Lives Impacted', value: '50,000+' },
-                  { label: 'Projects Completed', value: '160+' },
-                  { label: 'Years of Service', value: '14+' },
-                  { label: 'Communities Served', value: '50+' }
-                ].map((stat, i) => (
-                  <div key={i} className="bg-gray-900 rounded-xl p-3 sm:p-4 border border-gray-800">
-                    <p className="font-display text-xl sm:text-2xl font-bold text-secondary">{stat.value}</p>
-                    <p className="text-gray-500 text-xs sm:text-sm">{stat.label}</p>
-                  </div>
-                ))}
+      <section className="py-20 md:py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-20" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <FadeInSection>
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-6">
+                  <Heart className="w-4 h-4" />
+                  Our Story
+                </span>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
+                  Building a Better <span className="text-gradient">Tomorrow</span>
+                </h2>
+                <p className="text-gray-400 leading-relaxed mb-6 text-lg">
+                  Hope Foundation was established in 2010 with a simple yet powerful vision: to create 
+                  a world where every individual has access to opportunities for growth and development.
+                </p>
+                <p className="text-gray-400 leading-relaxed mb-6">
+                  What started as a small initiative to provide education to underprivileged children 
+                  in rural Maharashtra has grown into a comprehensive organization working across 
+                  education, healthcare, women empowerment, and environmental conservation.
+                </p>
+                <p className="text-gray-400 leading-relaxed mb-8">
+                  Today, we are proud to have impacted over 50,000 lives across 50+ communities, 
+                  with a dedicated team of 2,000+ volunteers and partnerships with government agencies, 
+                  corporations, and international organizations.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  {stats.map((stat, i) => (
+                    <div key={i} className="group p-4 bg-white/5 rounded-xl border border-white/10 hover:border-secondary/30 transition-all">
+                      <p className="text-2xl font-bold text-secondary mb-1">{stat.value}</p>
+                      <p className="text-gray-500 text-sm">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="relative mt-8 lg:mt-0">
-              <div className="absolute -top-2 -left-2 sm:-top-4 sm:-left-4 w-full h-full bg-secondary/20 rounded-2xl sm:rounded-3xl"></div>
-              <img
-                src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=700&fit=crop"
-                alt="Hope Foundation team"
-                className="relative rounded-2xl sm:rounded-3xl shadow-2xl w-full h-auto"
-              />
-            </div>
+            </FadeInSection>
+            <FadeInSection delay={200}>
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-secondary/20 to-transparent rounded-3xl blur-2xl opacity-50" />
+                <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=700&fit=crop" alt="Hope Foundation team" className="relative rounded-2xl w-full shadow-2xl" />
+                <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 bg-gradient-to-br from-secondary to-yellow-500 text-black p-6 md:p-8 rounded-2xl shadow-2xl shadow-secondary/30">
+                  <p className="text-3xl md:text-4xl font-display font-bold">14+</p>
+                  <p className="text-sm font-medium">Years of Impact</p>
+                </div>
+              </div>
+            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* Values Section */}
-      <section className="py-12 sm:py-20 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-16">
-            <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Our Values</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Core Values</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <FadeInSection>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Shield className="w-4 h-4" />
+                Our Values
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">Core Values</h2>
+            </div>
+          </FadeInSection>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-gray-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 text-center border border-gray-800 hover:border-secondary/50 transition-colors">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                  <value.icon className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />
+              <FadeInSection key={index} delay={index * 100}>
+                <div className="group p-8 bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2 text-center">
+                  <div className="w-16 h-16 bg-secondary/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <value.icon className="w-8 h-8 text-secondary" />
+                  </div>
+                  <h3 className="font-bold text-xl mb-2 text-white">{value.title}</h3>
+                  <p className="text-gray-500">{value.description}</p>
                 </div>
-                <h3 className="font-heading font-bold text-base sm:text-xl mb-1 sm:mb-2 text-white">{value.title}</h3>
-                <p className="text-gray-500 text-xs sm:text-sm">{value.description}</p>
-              </div>
+              </FadeInSection>
             ))}
           </div>
         </div>
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-12 sm:py-20 bg-black">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
-            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-12 border border-gray-800 h-full">
-              <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/20 rounded-full flex items-center justify-center">
-                  <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <FadeInSection>
+              <div className="group h-full bg-gradient-to-br from-gray-900 via-gray-900 to-black p-8 md:p-10 rounded-3xl border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
+                  <Eye className="w-8 h-8 text-secondary" />
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-white">Our Vision</h3>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">Our Vision</h3>
+                <p className="text-gray-400 leading-relaxed text-lg">
+                  A world where every individual has equal access to quality education, healthcare, 
+                  and opportunities for growth, regardless of their socioeconomic background.
+                </p>
               </div>
-              <p className="text-sm sm:text-base md:text-xl text-gray-400 leading-relaxed">
-                A world where every individual has equal access to quality education, healthcare, 
-                and opportunities for growth, regardless of their socioeconomic background. 
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-secondary to-yellow-600 text-black rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-12 h-full">
-              <div className="flex items-center space-x-3 sm:space-x-4 mb-4 sm:mb-6">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-black/20 rounded-full flex items-center justify-center">
-                  <Target className="w-6 h-6 sm:w-8 sm:h-8" />
+            </FadeInSection>
+            <FadeInSection delay={200}>
+              <div className="group h-full bg-gradient-to-br from-secondary to-yellow-600 p-8 md:p-10 rounded-3xl shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all duration-500 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-black/20 rounded-2xl flex items-center justify-center mb-6">
+                  <Target className="w-8 h-8 text-black" />
                 </div>
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold">Our Mission</h3>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-black mb-4">Our Mission</h3>
+                <p className="text-black/80 leading-relaxed text-lg">
+                  To empower underprivileged communities through comprehensive programs in education, 
+                  healthcare, women empowerment, and environmental sustainability.
+                </p>
               </div>
-              <p className="text-sm sm:text-base md:text-xl text-black/80 leading-relaxed">
-                To empower underprivileged communities through comprehensive programs in education, 
-                healthcare, women empowerment, and environmental sustainability.
-              </p>
-            </div>
+            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* Timeline */}
-      <section className="py-12 sm:py-20 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-16">
-            <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Timeline</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Our Journey</h2>
-          </div>
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <FadeInSection>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Award className="w-4 h-4" />
+                Timeline
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">Our Journey</h2>
+            </div>
+          </FadeInSection>
 
           <div className="relative">
-            {/* Mobile: Vertical line */}
-            <div className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 h-full w-0.5 sm:w-1 bg-gray-800"></div>
+            <div className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 h-full w-0.5 sm:w-1 bg-gradient-to-b from-secondary to-yellow-500"></div>
             
             <div className="space-y-6 sm:space-y-12">
               {milestones.map((milestone, index) => (
-                <div
-                  key={index}
-                  className={`relative flex items-center ${
-                    index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                  }`}
-                >
-                  {/* Desktop alternating layout */}
+                <div key={index} className={`relative flex items-center ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
                   <div className={`hidden sm:block w-5/12 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
-                    <div className="bg-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-800">
-                      <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary/20 text-secondary text-xs sm:text-sm font-bold rounded-full mb-1 sm:mb-2">
-                        {milestone.year}
-                      </span>
-                      <h3 className="font-heading font-bold text-base sm:text-xl mb-1 sm:mb-2 text-white">{milestone.title}</h3>
-                      <p className="text-gray-500 text-xs sm:text-sm">{milestone.description}</p>
-                    </div>
+                    <FadeInSection delay={index * 100}>
+                      <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 border border-white/10 hover:border-secondary/30 transition-all inline-block">
+                        <span className="inline-block px-3 py-1 bg-secondary/20 text-secondary text-sm font-bold rounded-full mb-2">
+                          {milestone.year}
+                        </span>
+                        <h3 className="font-bold text-xl mb-2 text-white">{milestone.title}</h3>
+                        <p className="text-gray-500">{milestone.description}</p>
+                      </div>
+                    </FadeInSection>
                   </div>
                   
-                  {/* Mobile: Full width card */}
                   <div className="sm:hidden flex items-start pl-12">
-                    <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 flex-1">
-                      <span className="inline-block px-2 py-0.5 bg-secondary/20 text-secondary text-xs font-bold rounded-full mb-1">
-                        {milestone.year}
-                      </span>
-                      <h3 className="font-bold text-white mb-1">{milestone.title}</h3>
-                      <p className="text-gray-500 text-xs">{milestone.description}</p>
-                    </div>
+                    <FadeInSection delay={index * 100}>
+                      <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-4 border border-white/10 flex-1">
+                        <span className="inline-block px-2 py-0.5 bg-secondary/20 text-secondary text-xs font-bold rounded-full mb-1">
+                          {milestone.year}
+                        </span>
+                        <h3 className="font-bold text-white mb-1">{milestone.title}</h3>
+                        <p className="text-gray-500 text-sm">{milestone.description}</p>
+                      </div>
+                    </FadeInSection>
                   </div>
                   
-                  <div className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-secondary rounded-full border-4 border-gray-950 shadow-lg"></div>
+                  <div className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 w-4 h-4 sm:w-6 sm:h-6 bg-secondary rounded-full border-4 border-black shadow-lg shadow-secondary/30"></div>
                 </div>
               ))}
             </div>
@@ -205,100 +257,117 @@ const About = () => {
       </section>
 
       {/* Team */}
-      <section className="py-12 sm:py-20 bg-black">
+      <section className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-16">
-            <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Our Team</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white">Meet Our Team</h2>
-          </div>
+          <FadeInSection>
+            <div className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-4">
+                <Users className="w-4 h-4" />
+                Our Team
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white">Meet Our Team</h2>
+            </div>
+          </FadeInSection>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {team.map((member, index) => (
-              <div key={index} className="bg-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center border border-gray-800 group hover:border-secondary/50 transition-colors">
-                <div className="relative w-20 h-20 sm:w-28 md:w-32 mx-auto mb-3 sm:mb-4">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform"
-                  />
+              <FadeInSection key={index} delay={index * 100}>
+                <div className="group bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 text-center border border-white/10 hover:border-secondary/30 transition-all duration-500 hover:-translate-y-2">
+                  <div className="relative w-28 h-28 mx-auto mb-4">
+                    <img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full border-2 border-secondary p-0.5 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-1 text-white">{member.name}</h3>
+                  <p className="text-secondary font-medium text-sm">{member.role}</p>
                 </div>
-                <h3 className="font-heading font-bold text-sm sm:text-base md:text-xl mb-0.5 sm:mb-1 text-white">{member.name}</h3>
-                <p className="text-secondary font-medium text-xs sm:text-sm">{member.role}</p>
-              </div>
+              </FadeInSection>
             ))}
           </div>
         </div>
       </section>
 
       {/* Compliance */}
-      <section className="py-12 sm:py-20 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div>
-              <p className="text-secondary font-medium tracking-wider uppercase text-xs sm:text-sm mb-3 sm:mb-4">Compliance</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-6 text-white">
-                Legal & Compliance
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg text-gray-400 mb-6 sm:mb-8">
-                We maintain the highest standards of transparency and compliance. Our registration 
-                and certifications ensure that your donation is in safe hands.
-              </p>
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <FadeInSection>
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 rounded-full text-secondary text-sm font-semibold mb-6">
+                  <Shield className="w-4 h-4" />
+                  Compliance
+                </span>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
+                  Legal & <span className="text-gradient">Compliance</span>
+                </h2>
+                <p className="text-gray-400 leading-relaxed mb-8 text-lg">
+                  We maintain the highest standards of transparency and compliance. Our registration 
+                  and certifications ensure that your donation is in safe hands.
+                </p>
 
-              <div className="space-y-3 sm:space-y-4">
-                {[
-                  { icon: Building, title: 'NGO Registration', value: 'NGO-MH-2024-001234' },
-                  { icon: Shield, title: 'PAN Number', value: 'AABTH1234B' },
-                  { icon: Award, title: '80G Certificate', value: 'Valid until March 2027' },
-                  { icon: Globe, title: 'FCRA Registration', value: '123456789' }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center space-x-3 sm:space-x-4 bg-gray-900 rounded-xl p-3 sm:p-4 border border-gray-800">
-                    <item.icon className="w-6 h-6 sm:w-8 sm:h-8 text-secondary flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white text-xs sm:text-sm truncate">{item.title}</p>
-                      <p className="text-gray-500 text-xs truncate">{item.value}</p>
+                <div className="space-y-4">
+                  {[
+                    { icon: Building, title: 'NGO Registration', value: 'NGO-MH-2024-001234' },
+                    { icon: Shield, title: 'PAN Number', value: 'AABTH1234B' },
+                    { icon: Award, title: '80G Certificate', value: 'Valid until March 2027' },
+                    { icon: Globe, title: 'FCRA Registration', value: '123456789' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center space-x-4 bg-white/5 rounded-xl p-4 border border-white/10 hover:border-secondary/30 transition-all">
+                      <item.icon className="w-8 h-8 text-secondary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-white">{item.title}</p>
+                        <p className="text-gray-500 text-sm">{item.value}</p>
+                      </div>
+                      <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
                     </div>
-                    <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0" />
+                  ))}
+                </div>
+              </div>
+            </FadeInSection>
+            <FadeInSection delay={200}>
+              <div className="grid grid-cols-2 gap-4 md:gap-6">
+                {[
+                  { icon: Award, title: '4-Star NGO', desc: 'Credibility Alliance' },
+                  { icon: Shield, title: 'ISO 9001:2015', desc: 'Quality Certified' },
+                  { icon: CheckCircle, title: 'Tax Exempt', desc: '80G & 12A' },
+                  { icon: Globe, title: 'FCRA Licensed', desc: 'International' }
+                ].map((item, i) => (
+                  <div key={i} className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 text-center border border-white/10 hover:border-secondary/30 transition-all duration-500 group hover:-translate-y-2">
+                    <item.icon className="w-12 h-12 text-secondary mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="font-bold text-lg mb-1 text-white">{item.title}</h3>
+                    <p className="text-gray-500 text-sm">{item.desc}</p>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mt-8 lg:mt-0">
-              {[
-                { icon: Award, title: '4-Star NGO', desc: 'Credibility Alliance' },
-                { icon: Shield, title: 'ISO 9001:2015', desc: 'Quality Certified' },
-                { icon: CheckCircle, title: 'Tax Exempt', desc: '80G & 12A' },
-                { icon: Globe, title: 'FCRA Licensed', desc: 'International' }
-              ].map((item, i) => (
-                <div key={i} className="bg-gray-900 backdrop-blur rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center border border-gray-800">
-                  <item.icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-secondary mx-auto mb-2 sm:mb-4" />
-                  <h3 className="font-bold text-sm sm:text-base md:text-xl mb-0.5 sm:mb-2 text-white">{item.title}</h3>
-                  <p className="text-gray-500 text-xs sm:text-sm">{item.desc}</p>
-                </div>
-              ))}
-            </div>
+            </FadeInSection>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-12 sm:py-20 bg-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Heart className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 text-secondary mx-auto mb-4 sm:mb-6" />
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-4 sm:mb-6 text-white">
-            Ready to Make a Difference?
-          </h2>
-          <p className="text-sm sm:text-base md:text-xl text-gray-400 mb-6 sm:mb-8">
-            Join us in our mission to transform lives and build a better tomorrow for everyone.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-            <Link to="/donate" className="px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-black font-semibold rounded-xl hover:bg-yellow-400 transition-all text-sm sm:text-base">
-              Donate Now
-            </Link>
-            <Link to="/contact" className="px-6 py-3 sm:px-8 sm:py-4 border-2 border-gray-700 text-white font-semibold rounded-xl hover:border-secondary hover:text-secondary transition-all text-sm sm:text-base">
-              Contact Us
-            </Link>
-          </div>
+      <section className="py-20 md:py-32 bg-black relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-secondary/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <FadeInSection>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-secondary/20 rounded-full mb-8">
+              <Heart className="w-10 h-10 text-secondary" />
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">Ready to Make a Difference?</h2>
+            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">Join us in our mission to transform lives and build a better tomorrow for everyone.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/donate" className="group relative w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-secondary to-yellow-500 text-black font-bold text-lg rounded-xl overflow-hidden shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition-all duration-300 hover:-translate-y-1">
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative flex items-center justify-center gap-3">
+                  <Heart className="w-5 h-5" />
+                  Donate Now
+                </span>
+              </Link>
+              <Link to="/contact" className="w-full sm:w-auto px-10 py-4 bg-white/5 backdrop-blur-xl border border-white/20 text-white font-semibold text-lg rounded-xl hover:bg-white/10 hover:border-secondary/50 transition-all duration-300">
+                Contact Us
+              </Link>
+            </div>
+          </FadeInSection>
         </div>
       </section>
     </div>

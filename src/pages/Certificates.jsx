@@ -27,13 +27,49 @@ const Certificates = () => {
   }
 
   const downloadCertificate = async (donation, type = 'donation') => {
-    try { await axios.post('/api/certificates/generate', { donationId: donation._id, type }); toast.success(`${type === '80g' ? '80G Certificate' : 'Certificate'} generated!`) } 
-    catch { toast.success(`${type === '80g' ? '80G Certificate' : 'Certificate'} downloaded! (Demo)`) }
+    try {
+      toast.loading('Generating certificate...')
+      const res = await axios.post('/api/certificates/generate', { donationId: donation._id, type })
+      toast.dismiss()
+      const downloadUrl = res.data.certificate?.downloadUrl
+      if (downloadUrl) {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.setAttribute('download', '')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        toast.success(`${type === '80g' ? '80G Certificate' : 'Certificate'} downloaded!`)
+      } else {
+        toast.success('Certificate generated! Check dashboard.')
+      }
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Failed to generate certificate')
+    }
   }
 
   const downloadReceipt = async (donation) => {
-    try { await axios.post('/api/certificates/receipt/generate', { donationId: donation._id }); toast.success('Receipt generated!') } 
-    catch { toast.success('Receipt downloaded! (Demo)') }
+    try {
+      toast.loading('Generating receipt...')
+      const res = await axios.post('/api/certificates/receipt/generate', { donationId: donation._id })
+      toast.dismiss()
+      const downloadUrl = res.data.receipt?.downloadUrl
+      if (downloadUrl) {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.setAttribute('download', '')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        toast.success('Receipt downloaded!')
+      } else {
+        toast.success('Receipt generated! Check dashboard.')
+      }
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Failed to generate receipt')
+    }
   }
 
   return (
