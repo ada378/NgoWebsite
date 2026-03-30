@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, User, ChevronRight } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,7 +12,7 @@ const Blog = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get('/api/blogs', { params: filter !== 'All' ? { category: filter } : {} })
+      const response = await api.get('/api/blogs', { params: filter !== 'All' ? { category: filter } : {} })
       setBlogs(response.data.blogs || [])
     } catch (error) {
       setBlogs([

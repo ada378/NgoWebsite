@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Shield, CheckCircle, XCircle, Award, Calendar, DollarSign, User, Loader2 } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const CertificateVerify = () => {
   const { certificateId } = useParams()
@@ -16,7 +16,7 @@ const CertificateVerify = () => {
 
   const verifyCertificate = async (id) => {
     try {
-      const response = await axios.get(`/api/certificates/verify/${id}`)
+      const response = await api.get(`/api/certificates/verify/${id}`)
       setResult(response.data.certificate)
     } catch { setError(true) }
     setLoading(false)

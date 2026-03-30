@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { Heart, Users, GraduationCap, Activity, TreePine, Shield, Award, ArrowRight, ChevronRight, CheckCircle, Star, Quote, Target, Eye, Mail, Send, Play, PlayCircle, Calendar, MapPin, Phone, Video, Sparkles, Globe, TrendingUp } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const FadeInSection = ({ children, delay = 0, className = '' }) => {
   const ref = useRef(null)
@@ -99,7 +99,7 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('/api/programs?status=active')
+      const response = await api.get('/api/programs?status=active')
       setPrograms(response.data.programs?.slice(0, 4) || [])
     } catch (error) {
       setPrograms([

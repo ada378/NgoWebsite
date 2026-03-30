@@ -2,13 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { BarChart3, Users as UsersIcon, DollarSign, FileText, Settings, LogOut, Heart, Award, LayoutDashboard, Menu, Download, Shield, ChevronLeft, ChevronRight, RefreshCw, Plus, Edit, Trash2, Mail, Send, CheckCircle, XCircle, AlertCircle, TrendingUp, BarChart, PieChart, Activity, X, Search, Filter, EyeOff, Check, Clock, CreditCard, Smartphone, Building2 } from 'lucide-react'
 import { BarChart as RechartsBar, Bar, LineChart, Line, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import axios from 'axios'
 import toast from 'react-hot-toast'
 import AdminLogin from './AdminLogin'
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api'
-})
+import api from '../config/api'
 
 const uploadImage = async (file) => {
   const formData = new FormData()
@@ -18,14 +14,6 @@ const uploadImage = async (file) => {
   })
   return response.data.file.url
 }
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
 
 const COLORS = ['#D4A84B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#F59E0B']
 

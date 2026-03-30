@@ -1,12 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Shield, Lock, Mail, Eye, EyeOff, ArrowLeft, Loader2 } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 import toast from 'react-hot-toast'
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api'
-})
 
 const AdminLogin = () => {
   const navigate = useNavigate()

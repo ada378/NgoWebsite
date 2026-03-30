@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Heart, CreditCard, Smartphone, Building2, Check, Shield, Award, Loader2, Receipt, FileText } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 import toast from 'react-hot-toast'
 
 const Donate = () => {
@@ -66,7 +66,7 @@ const Donate = () => {
     let certId = `CERT${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`
     
     try {
-      const response = await axios.post('/api/donations', {
+      const response = await api.post('/api/donations', {
         donorName: formData.anonymous ? 'Anonymous' : formData.donorName,
         donorEmail: formData.email,
         amount: finalAmount,
@@ -81,8 +81,8 @@ const Donate = () => {
 
     try {
       if (razorpayLoaded && window.Razorpay) {
-        const keyResponse = await axios.get('/api/payment/key')
-        const orderResponse = await axios.post('/api/payment/create-order', {
+        const keyResponse = await api.get('/api/payment/key')
+        const orderResponse = await api.post('/api/payment/create-order', {
           amount: finalAmount,
           currency: 'INR',
           receipt: donationId
@@ -98,7 +98,7 @@ const Donate = () => {
           order_id: orderResponse.data.orderId,
           handler: async (response) => {
             try {
-              await axios.post('/api/donations/verify-payment', {
+              await api.post('/api/donations/verify-payment', {
                 donationId,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
@@ -111,9 +111,9 @@ const Donate = () => {
               
               setTimeout(async () => {
                 try {
-                  await axios.post('/api/certificates/generate', { donationId, type: 'donation' })
-                  await axios.post('/api/certificates/generate', { donationId, type: '80g' })
-                  await axios.post('/api/certificates/receipt/generate', { donationId })
+                  await api.post('/api/certificates/generate', { donationId, type: 'donation' })
+                  await api.post('/api/certificates/generate', { donationId, type: '80g' })
+                  await api.post('/api/certificates/receipt/generate', { donationId })
                   toast.success('All certificates auto-generated!')
                 } catch { toast.success('Certificates in dashboard.') }
               }, 500)
@@ -160,10 +160,10 @@ const Donate = () => {
     
     setTimeout(async () => {
       try {
-        await axios.post('/api/donations/verify-payment', { donationId, razorpayPaymentId: 'DEMO_' + Date.now() })
-        await axios.post('/api/certificates/generate', { donationId, type: 'donation' })
-        await axios.post('/api/certificates/generate', { donationId, type: '80g' })
-        await axios.post('/api/certificates/receipt/generate', { donationId })
+        await api.post('/api/donations/verify-payment', { donationId, razorpayPaymentId: 'DEMO_' + Date.now() })
+        await api.post('/api/certificates/generate', { donationId, type: 'donation' })
+        await api.post('/api/certificates/generate', { donationId, type: '80g' })
+        await api.post('/api/certificates/receipt/generate', { donationId })
         toast.success('All certificates auto-generated!')
       } catch { toast.success('Certificates in dashboard.') }
     }, 500)
@@ -173,7 +173,7 @@ const Donate = () => {
   const downloadReceipt = async () => {
     try {
       toast.loading('Generating receipt...')
-      const res = await axios.post('/api/certificates/receipt/generate', { donationId: donationResult?.donationId })
+      const res = await api.post('/api/certificates/receipt/generate', { donationId: donationResult?.donationId })
       toast.dismiss()
       const downloadUrl = res.data.receipt?.downloadUrl
       if (downloadUrl) {
@@ -196,7 +196,7 @@ const Donate = () => {
   const downloadCertificate = async (type) => {
     try {
       toast.loading('Generating certificate...')
-      const res = await axios.post('/api/certificates/generate', { donationId: donationResult?.donationId, type })
+      const res = await api.post('/api/certificates/generate', { donationId: donationResult?.donationId, type })
       toast.dismiss()
       const downloadUrl = res.data.certificate?.downloadUrl
       if (downloadUrl) {

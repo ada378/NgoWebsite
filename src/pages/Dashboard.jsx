@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Heart, Download, Award, User, LogOut, ChevronRight, Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import axios from 'axios'
+import api from '../config/api'
 import toast from 'react-hot-toast'
 
 const Dashboard = () => {
@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   const fetchDonations = async () => {
     try {
-      const response = await axios.get('/api/donations/my-donations')
+      const response = await api.get('/api/donations/my-donations')
       setDonations(response.data.donations || [])
     } catch (error) {
       setDonations([
@@ -28,7 +28,7 @@ const Dashboard = () => {
   const downloadReceipt = async (donation) => {
     try {
       toast.loading('Generating receipt...')
-      const res = await axios.post('/api/certificates/receipt/generate', { donationId: donation._id })
+      const res = await api.post('/api/certificates/receipt/generate', { donationId: donation._id })
       toast.dismiss()
       const downloadUrl = res.data.receipt?.downloadUrl
       if (downloadUrl) {
@@ -51,7 +51,7 @@ const Dashboard = () => {
   const downloadCertificate = async (donation) => {
     try {
       toast.loading('Generating certificate...')
-      const res = await axios.post('/api/certificates/generate', { donationId: donation._id, type: 'donation' })
+      const res = await api.post('/api/certificates/generate', { donationId: donation._id, type: 'donation' })
       toast.dismiss()
       const downloadUrl = res.data.certificate?.downloadUrl
       if (downloadUrl) {

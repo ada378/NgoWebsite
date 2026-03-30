@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { GraduationCap, Activity, Users, TreePine, Heart, ArrowRight, Check, Target, Eye, Users as UsersIcon } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const ProgramDetail = () => {
   const { slug } = useParams()
@@ -14,7 +14,7 @@ const ProgramDetail = () => {
 
   const fetchProgram = async () => {
     try {
-      const response = await axios.get(`/api/programs/${slug}`)
+      const response = await api.get(`/api/programs/${slug}`)
       setProgram(response.data.program)
     } catch (error) {
       setProgram({

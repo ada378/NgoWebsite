@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Calendar, User, ArrowLeft, Share2, Twitter, Facebook, Linkedin } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const BlogDetail = () => {
   const { slug } = useParams()
@@ -14,7 +14,7 @@ const BlogDetail = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await axios.get(`/api/blogs/${slug}`)
+      const response = await api.get(`/api/blogs/${slug}`)
       setBlog(response.data.blog)
     } catch (error) {
       setBlog({

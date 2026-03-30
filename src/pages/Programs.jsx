@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { GraduationCap, Activity, Users, TreePine, ArrowRight, Heart, TrendingUp } from 'lucide-react'
-import axios from 'axios'
+import api from '../config/api'
 
 const FadeInSection = ({ children, delay = 0, className = '' }) => {
   const ref = useRef(null)
@@ -38,7 +38,7 @@ const Programs = () => {
 
   const fetchPrograms = async () => {
     try {
-      const response = await axios.get('/api/programs')
+      const response = await api.get('/api/programs')
       setPrograms(response.data.programs || [])
     } catch (error) {
       setPrograms([
