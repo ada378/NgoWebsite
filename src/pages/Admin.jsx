@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { BarChart3, Users as UsersIcon, DollarSign, FileText, Settings, LogOut, Heart, Award, LayoutDashboard, Menu, Download, Shield, ChevronLeft, ChevronRight, RefreshCw, Plus, Edit, Trash2, Mail, Send, CheckCircle, XCircle, AlertCircle, TrendingUp, BarChart, PieChart, Activity, X, Search, Filter, EyeOff, Eye, Check, Clock, CreditCard, Smartphone, Building2 } from 'lucide-react'
+import { BarChart3, Users as UsersIcon, DollarSign, FileText, Settings, LogOut, Heart, Award, LayoutDashboard, Menu, Download, Shield, ChevronLeft, ChevronRight, RefreshCw, Plus, Edit, Trash2, Mail, Send, CheckCircle, XCircle, AlertCircle, TrendingUp, BarChart, PieChart, Activity, X, Search, Filter, EyeOff, Eye, Check, Clock, CreditCard, Smartphone, Building2, UserCog, Phone } from 'lucide-react'
 import { BarChart as RechartsBar, Bar, LineChart, Line, PieChart as RechartsPie, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import toast from 'react-hot-toast'
 import AdminLogin from './AdminLogin'
@@ -236,6 +236,7 @@ const Admin = () => {
     { id: 'donate', icon: Heart, label: 'Donate' },
     { id: 'donations', icon: DollarSign, label: 'Donations' },
     { id: 'donors', icon: UsersIcon, label: 'Donors' },
+    { id: 'crm', icon: UserCog, label: 'CRM' },
     { id: 'programs', icon: Heart, label: 'Programs' },
     { id: 'blogs', icon: FileText, label: 'Blogs' },
     { id: 'users', icon: Shield, label: 'Users' },
@@ -594,6 +595,142 @@ const Admin = () => {
       )}
     </div>
   )
+
+  const CRM = () => {
+    const [leads, setLeads] = useState([
+      { id: 1, name: 'Rahul Sharma', email: 'rahul@email.com', phone: '+91 98765 43210', status: 'hot', lastContact: '2026-03-30', notes: 'Interested in Education program', totalPotential: 50000 },
+      { id: 2, name: 'Priya Patel', email: 'priya@email.com', phone: '+91 87654 32109', status: 'warm', lastContact: '2026-03-28', notes: 'Wants to donate monthly', totalPotential: 25000 },
+      { id: 3, name: 'Amit Singh', email: 'amit@email.com', phone: '+91 76543 21098', status: 'cold', lastContact: '2026-03-25', notes: 'Follow up needed', totalPotential: 10000 },
+      { id: 4, name: 'Sneha Gupta', email: 'sneha@email.com', phone: '+91 65432 10987', status: 'hot', lastContact: '2026-03-29', notes: 'Corporate donor interest', totalPotential: 100000 },
+      { id: 5, name: 'Vikram Rao', email: 'vikram@email.com', phone: '+91 54321 09876', status: 'warm', lastContact: '2026-03-27', notes: 'Attended charity event', totalPotential: 30000 },
+    ])
+    const [filterStatus, setFilterStatus] = useState('all')
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const statusColors = {
+      hot: 'bg-red-500/20 text-red-400 border-red-500/30',
+      warm: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      cold: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    }
+
+    const filteredLeads = leads.filter(lead => {
+      const matchesStatus = filterStatus === 'all' || lead.status === filterStatus
+      const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+      return matchesStatus && matchesSearch
+    })
+
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-xl sm:text-2xl font-bold text-white">CRM - Donor Relations</h3>
+            <p className="text-gray-400 text-sm">Manage leads and donor relationships</p>
+          </div>
+          <button className="px-4 py-2 bg-secondary text-black rounded-lg font-semibold hover:bg-yellow-400 flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Add Lead
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-2xl font-bold text-white">{leads.length}</p>
+            <p className="text-sm text-gray-400">Total Leads</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-red-500/30">
+            <p className="text-2xl font-bold text-red-400">{leads.filter(l => l.status === 'hot').length}</p>
+            <p className="text-sm text-gray-400">Hot Leads</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-yellow-500/30">
+            <p className="text-2xl font-bold text-yellow-400">{leads.filter(l => l.status === 'warm').length}</p>
+            <p className="text-sm text-gray-400">Warm Leads</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <p className="text-2xl font-bold text-secondary">₹{(leads.reduce((sum, l) => sum + l.totalPotential, 0) / 100000).toFixed(1)}L</p>
+            <p className="text-sm text-gray-400">Potential</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <input 
+              type="text" 
+              placeholder="Search by name or email..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:border-secondary focus:outline-none"
+            />
+          </div>
+          <div className="flex gap-2">
+            {['all', 'hot', 'warm', 'cold'].map(status => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  filterStatus === status 
+                    ? status === 'all' ? 'bg-secondary text-black' : statusColors[status]
+                    : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700'
+                }`}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-700/50">
+                <tr className="text-left text-xs sm:text-sm text-gray-400">
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium hidden sm:table-cell">Contact</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium hidden md:table-cell">Last Contact</th>
+                  <th className="px-4 py-3 font-medium hidden lg:table-cell">Potential</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-700">
+                {filteredLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-gray-700/30 transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-white">{lead.name}</p>
+                      <p className="text-xs text-gray-500 truncate max-w-[150px]">{lead.notes}</p>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <p className="text-sm text-gray-300">{lead.email}</p>
+                      <p className="text-xs text-gray-500">{lead.phone}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${statusColors[lead.status]}`}>
+                        {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-400 hidden md:table-cell">{lead.lastContact}</td>
+                    <td className="px-4 py-3 font-bold text-secondary hidden lg:table-cell">₹{lead.totalPotential.toLocaleString()}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button className="p-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"><Eye className="w-4 h-4" /></button>
+                        <button onClick={() => { setEmailForm({ ...emailForm, to: lead.email }); setShowModal('email') }} className="p-1.5 bg-gray-700 text-secondary rounded hover:bg-gray-600"><Mail className="w-4 h-4" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filteredLeads.length === 0 && (
+            <div className="text-center py-12">
+              <UsersIcon className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400">No leads found</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   const Donors = () => (
     <div className="bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-700">
@@ -1346,6 +1483,7 @@ const Admin = () => {
           {activeTab === 'donate' && <DonateSection user={user} />}
           {activeTab === 'donations' && <Donations />}
           {activeTab === 'donors' && <Donors />}
+          {activeTab === 'crm' && <CRM />}
           {activeTab === 'programs' && <Programs />}
           {activeTab === 'blogs' && <Blogs />}
           {activeTab === 'users' && <Users />}
