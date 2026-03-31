@@ -26,7 +26,7 @@ const AdminLogin = () => {
     setError('')
 
     try {
-      const response = await api.post('/auth/login', { email, password })
+      const response = await api.post('/api/auth/login', { email, password })
       
       if (response.data.user?.role !== 'admin') {
         setError('Access denied. Admin credentials required.')

@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Menu, X, Heart, User, LogOut, LayoutDashboard, ChevronDown, MenuIcon, Shield } from 'lucide-react'
+import { Menu, X, Heart, User, LogOut, LayoutDashboard, ChevronDown, Shield } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const Layout = () => {
@@ -24,8 +24,7 @@ const Layout = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Programs', path: '/programs' },
-    { name: 'Transparency', path: '/transparency' },
-    { name: 'Gallery', path: '/gallery' },
+    { name: 'Donate', path: '/donate' },
     { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ]
@@ -165,12 +164,12 @@ const Layout = () => {
               ))}
             </div>
 
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center gap-3">
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
                   >
                     <div className="w-9 h-9 bg-gradient-to-br from-secondary to-yellow-600 rounded-xl flex items-center justify-center">
                       <User className="w-5 h-5 text-black" />
@@ -182,7 +181,7 @@ const Layout = () => {
                   {isDropdownOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
-                      <div className="absolute right-0 mt-3 w-64 bg-gradient-to-b from-gray-900 to-black backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 py-2 z-50 border border-white/10 animate-scale-in">
+                      <div className="absolute right-0 mt-3 w-64 bg-gradient-to-b from-gray-900 to-black backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/50 py-2 z-50 border border-white/10">
                         <div className="px-5 py-4 border-b border-white/10">
                           <p className="font-semibold text-white">{user?.name}</p>
                           <p className="text-xs text-gray-400">{user?.email}</p>
@@ -207,16 +206,15 @@ const Layout = () => {
                 </div>
               ) : (
                 <>
-                  <Link to="/admin/login" className="px-5 py-2.5 rounded-xl font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm border border-white/10 hover:border-white/20">
+                  <Link to="/admin/login" className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors">
                     Admin
                   </Link>
-                  <Link to="/login" className="px-5 py-2.5 rounded-xl font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm border border-white/10 hover:border-white/20">
+                  <Link to="/login" className="px-5 py-2.5 rounded-xl font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all text-sm">
                     Login
                   </Link>
-                  <Link to="/donate" className="group relative bg-gradient-to-r from-secondary to-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-secondary/30 transition-all flex items-center gap-2 overflow-hidden">
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    <Heart className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Donate Now</span>
+                  <Link to="/donate" className="group relative bg-gradient-to-r from-secondary to-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-secondary/30 transition-all flex items-center gap-2">
+                    <Heart className="w-5 h-5" />
+                    <span>Donate Now</span>
                   </Link>
                 </>
               )}
@@ -246,7 +244,7 @@ const Layout = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <MenuIcon className="w-6 h-6 text-white" />}
+            {mobileMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
           </button>
         </div>
       </nav>

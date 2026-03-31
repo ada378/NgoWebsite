@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
-import { GraduationCap, Activity, Users, TreePine, ArrowRight, Heart, TrendingUp } from 'lucide-react'
+import { GraduationCap, Activity, Users, TreePine, ArrowRight, Heart, TrendingUp, Globe } from 'lucide-react'
 import api from '../config/api'
 
 const FadeInSection = ({ children, delay = 0, className = '' }) => {
