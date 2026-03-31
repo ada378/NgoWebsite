@@ -9,7 +9,7 @@ import api from '../config/api'
 const uploadImage = async (file) => {
   const formData = new FormData()
   formData.append('file', file)
-  const response = await api.post('/upload', formData, {
+  const response = await api.post('/api/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
   return response.data.file.url
@@ -46,14 +46,14 @@ const Admin = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/admin/stats')
+      const response = await api.get('/api/admin/stats')
       setStats(response.data)
     } catch (err) { console.error('Error fetching stats:', err) }
   }
 
   const fetchAnalytics = async () => {
     try {
-      const response = await api.get('/admin/analytics')
+      const response = await api.get('/api/admin/analytics')
       setAnalytics(response.data)
     } catch (err) { console.error('Error fetching analytics:', err) }
   }
@@ -63,7 +63,7 @@ const Admin = () => {
       const params = new URLSearchParams({ page, limit: 10 })
       if (filters.status) params.append('status', filters.status)
       if (filters.program) params.append('program', filters.program)
-      const response = await api.get(`/admin/donations?${params}`)
+      const response = await api.get(`/api/admin/donations?${params}`)
       setDonations(response.data.donations)
       setPagination({ page: response.data.page, pages: response.data.pages, total: response.data.total })
     } catch (err) { console.error('Error fetching donations:', err) }
@@ -71,14 +71,14 @@ const Admin = () => {
 
   const fetchDonors = async (page = 1) => {
     try {
-      const response = await api.get(`/admin/donors?page=${page}&limit=12`)
+      const response = await api.get(`/api/admin/donors?page=${page}&limit=12`)
       setDonors(response.data.donors)
     } catch (err) { console.error('Error fetching donors:', err) }
   }
 
   const fetchUsers = async (page = 1) => {
     try {
-      const response = await api.get(`/admin/users?page=${page}&limit=20`)
+      const response = await api.get(`/api/admin/users?page=${page}&limit=20`)
       setUsers(response.data.users)
       setPagination({ page: response.data.page, pages: response.data.pages, total: response.data.total })
     } catch (err) { console.error('Error fetching users:', err) }
@@ -86,21 +86,21 @@ const Admin = () => {
 
   const fetchPrograms = async () => {
     try {
-      const response = await api.get('/programs')
+      const response = await api.get('/api/programs')
       setPrograms(response.data.programs)
     } catch (err) { console.error('Error fetching programs:', err) }
   }
 
   const fetchBlogs = async () => {
     try {
-      const response = await api.get('/blogs?limit=50')
+      const response = await api.get('/api/blogs?limit=50')
       setBlogs(response.data.blogs)
     } catch (err) { console.error('Error fetching blogs:', err) }
   }
 
   const fetchCertificates = async () => {
     try {
-      const response = await api.get('/admin/donations?status=completed&limit=50')
+      const response = await api.get('/api/admin/donations?status=completed&limit=50')
       const completed = response.data.donations.filter(d => d.certificateId)
       setCertificates(completed)
     } catch (err) { console.error('Error fetching certificates:', err) }
@@ -142,7 +142,7 @@ const Admin = () => {
 
   const exportDonations = async () => {
     try {
-      const response = await api.get('/admin/export/donations', { responseType: 'blob' })
+      const response = await api.get('/api/admin/export/donations', { responseType: 'blob' })
       const url = window.URL.createObjectURL(new Blob([response.data]))
       const link = document.createElement('a')
       link.href = url
@@ -193,7 +193,7 @@ const Admin = () => {
   const handleSendEmail = async (e) => {
     e.preventDefault()
     try {
-      await api.post('/admin/send-email', emailForm)
+      await api.post('/api/admin/send-email', emailForm)
       toast.success('Email sent!')
       setShowModal(null)
       setEmailForm({ to: '', subject: '', message: '' })
@@ -203,7 +203,7 @@ const Admin = () => {
   const handleBroadcast = async (e) => {
     e.preventDefault()
     try {
-      const res = await api.post('/admin/broadcast', broadcastForm)
+      const res = await api.post('/api/admin/broadcast', broadcastForm)
       toast.success(res.data.message)
       setShowModal(null)
       setBroadcastForm({ subject: '', message: '', target: 'all' })
@@ -372,7 +372,7 @@ const Admin = () => {
       let donationId = 'DEMO-' + Date.now()
       
       try {
-        const response = await api.post('/donations', {
+        const response = await api.post('/api/donations', {
           donorName: formData.anonymous ? 'Anonymous' : formData.donorName,
           donorEmail: formData.email,
           amount: finalAmount,
@@ -388,7 +388,7 @@ const Admin = () => {
         toast.success('Donation successful!')
         
         try {
-          await api.post('/certificates/generate', { donationId, type: 'donation' })
+          await api.post('/api/certificates/generate', { donationId, type: 'donation' })
         } catch {}
         
         fetchStats()
@@ -657,7 +657,7 @@ const Admin = () => {
           await api.put(`/api/programs/${editData._id}`, formData)
           toast.success('Program updated')
         } else {
-          await api.post('/programs', formData)
+          await api.post('/api/programs', formData)
           toast.success('Program created')
         }
         fetchPrograms()
@@ -810,7 +810,7 @@ const Admin = () => {
           await api.put(`/api/blogs/${editData._id}`, data)
           toast.success('Blog updated')
         } else {
-          await api.post('/blogs', data)
+          await api.post('/api/blogs', data)
           toast.success('Blog created')
         }
         fetchBlogs()
